@@ -31,6 +31,8 @@ class Ui_loginDialog
 public:
     QFrame *frame;
     QWidget *widget;
+    QHBoxLayout *horizontalLayout_3;
+    QSpacerItem *horizontalSpacer;
     QVBoxLayout *verticalLayout_2;
     QSpacerItem *verticalSpacer;
     QVBoxLayout *verticalLayout;
@@ -43,6 +45,7 @@ public:
     QSpacerItem *verticalSpacer_2;
     QPushButton *pushButton_login;
     QSpacerItem *verticalSpacer_3;
+    QSpacerItem *horizontalSpacer_2;
 
     void setupUi(QDialog *loginDialog)
     {
@@ -60,7 +63,7 @@ public:
 "\n"
 "#frame {\n"
 "border-radius: 15px;\n"
-"background-image: url(:/images/images/background.JPG)\n"
+"background-image: url(:/images/images/dial_background.jpg)\n"
 "}\n"
 "\n"
 "QLineEdit {\n"
@@ -93,10 +96,16 @@ public:
         frame->setFrameShadow(QFrame::Raised);
         widget = new QWidget(frame);
         widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(50, -2, 271, 281));
-        verticalLayout_2 = new QVBoxLayout(widget);
+        widget->setGeometry(QRect(10, -2, 361, 281));
+        horizontalLayout_3 = new QHBoxLayout(widget);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer);
+
+        verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer);
@@ -145,12 +154,22 @@ public:
         pushButton_login = new QPushButton(widget);
         pushButton_login->setObjectName(QStringLiteral("pushButton_login"));
         pushButton_login->setCursor(QCursor(Qt::PointingHandCursor));
+        pushButton_login->setStyleSheet(QLatin1String(":hover {\n"
+"color: rgb(200, 200, 200)\n"
+"}"));
 
         verticalLayout_2->addWidget(pushButton_login);
 
         verticalSpacer_3 = new QSpacerItem(20, 28, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer_3);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_2);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_2);
 
 
         retranslateUi(loginDialog);

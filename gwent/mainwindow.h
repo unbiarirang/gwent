@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include "logindialog.h"
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -19,7 +20,9 @@ public:
 
 private slots:
     void showLoginDialog();
-    void changeStackedWidget();
+    void changeStackedWidget(QString);
+
+    void on_button_login_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -56,13 +56,13 @@ static const uint qt_meta_data_loginDialog[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   24,    2, 0x06 /* Public */,
+       1,    1,   24,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   25,    2, 0x08 /* Private */,
+       3,    0,   27,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    2,
 
  // slots: parameters
     QMetaType::Void,
@@ -76,7 +76,7 @@ void loginDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         loginDialog *_t = static_cast<loginDialog *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->loginSuccess(); break;
+        case 0: _t->loginSuccess((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->on_pushButton_login_clicked(); break;
         default: ;
         }
@@ -84,14 +84,13 @@ void loginDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (loginDialog::*_t)();
+            typedef void (loginDialog::*_t)(QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&loginDialog::loginSuccess)) {
                 *result = 0;
                 return;
             }
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObject loginDialog::staticMetaObject = {
@@ -131,9 +130,10 @@ int loginDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void loginDialog::loginSuccess()
+void loginDialog::loginSuccess(QString _t1)
 {
-    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

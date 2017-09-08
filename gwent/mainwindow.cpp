@@ -4,6 +4,7 @@
 #include "ui_logindialog.h"
 #include <QTimer>
 #include <QDialog>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,12 +26,17 @@ void MainWindow::showLoginDialog()
     loginDial = new loginDialog(this);
     loginDial->show();
 
-    connect(loginDial, SIGNAL(loginSuccess()), this, SLOT(changeStackedWidget()));
+    connect(loginDial, SIGNAL(loginSuccess(QString)), this, SLOT(changeStackedWidget(QString)));
 }
 
-void MainWindow::changeStackedWidget()
+void MainWindow::changeStackedWidget(QString username)
 {
     stackedWidget = ui->stackedWidget;
     stackedWidget->setCurrentIndex(1);
+    ui->label_username->setText("hi, " + username);
 }
 
+void MainWindow::on_button_login_clicked()
+{
+    showLoginDialog();
+}

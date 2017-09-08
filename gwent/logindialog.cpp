@@ -1,6 +1,7 @@
 #include "logindialog.h"
 #include "ui_logindialog.h"
 #include <QMessageBox>
+#include <QString>
 
 loginDialog::loginDialog(QWidget *parent) :
     QDialog(parent),
@@ -25,9 +26,9 @@ void loginDialog::on_pushButton_login_clicked()
 {
     int loginResult = login(ui->lineEdit_username->text().toStdString(), ui->lineEdit_password->text().toStdString());
 
-    if (loginResult) {
+    if (loginResult) { // login success
         this->close();
-        emit loginSuccess();
+        emit loginSuccess(ui->lineEdit_username->text());
     } else {
         QMessageBox::warning(this, "login failed", "username or password is incorrect");
     }

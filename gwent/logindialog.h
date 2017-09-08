@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <string>
+#include <QString>
 
 namespace Ui {
 class loginDialog;
@@ -12,7 +13,7 @@ class loginDialog : public QDialog
 {
     Q_OBJECT
 signals:
-    void loginSuccess();
+    void loginSuccess(QString);
 
 public:
     explicit loginDialog(QWidget *parent = 0);

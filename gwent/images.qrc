@@ -5,6 +5,7 @@
         <file>images/ciri.jpg</file>
         <file>images/nithral.jpg</file>
         <file>images/yennefer.jpg</file>
-        <file>images/background.JPG</file>
+        <file>images/dial_background.jpg</file>
+        <file>images/board.jpg</file>
     </qresource>
 </RCC>
