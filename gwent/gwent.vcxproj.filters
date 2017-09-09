@@ -24,6 +24,21 @@
     <ClCompile Include="util.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="skill.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cardBase.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="card.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="user.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="class.h">
@@ -33,6 +48,21 @@
       <Filter>리소스 파일</Filter>
     </ClInclude>
     <ClInclude Include="enum.h">
+      <Filter>리소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="skill.h">
+      <Filter>리소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cardBase.h">
+      <Filter>리소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="card.h">
+      <Filter>리소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="user.h">
+      <Filter>리소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
       <Filter>리소스 파일</Filter>
     </ClInclude>
   </ItemGroup>

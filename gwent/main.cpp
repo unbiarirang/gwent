@@ -1,12 +1,16 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
 #include "json/json.h"
-#include "class.h"
+
+#include "game.h"
+#include "skill.h"
+
+#include <iostream>
+#include <fstream>
+
 #pragma comment(lib, "json/json_vc71_libmtd")
 using namespace std;
 
 vector<CardBase*> cardCollection;
+extern SkillMap skillMap;
 
 bool ReadFromFile(const char* filename, char* buffer, int len) {
 	FILE* fp = nullptr;
@@ -48,11 +52,12 @@ int ReadFromJson() {
 		string index = to_string(i + 1);
 		name = root[index]["name"].asString();
 		fg = root[index]["figures"];
+		figures.clear();
 		for (int j = 0; j < fg.size(); j++) {
 			figures.push_back(fg[j].asInt());
 		}
 		CardBase* card = new CardBase(name, figures[0], figures[1], figures[2],figures[3], 
-			figures[4], figures[5], figures[6], figures[7], figures[8], figures[9]);
+			figures[4], figures[5], figures[6], figures[7], figures[8], figures[9], figures[10], figures[11]);
 		cardCollection.push_back(card);
 
 		cout << card->name << endl;
@@ -82,24 +87,57 @@ int main() {
 		cout <<"deck: "<<  x << endl;
 	}
 
-	int x = user1->deck[0];
-	user1->removeFrom(LO::DECK, x);
-	int y = user1->deck[0];
-	user1->removeFrom(LO::DECK, y);
-	user1->insertInto(LO::LINE1, x);
-	user1->insertInto(LO::LINE1, y);
-	for (auto x : user1->line[0]) {
-		cout << "line1: " << x << endl;
+	user1->deployCard(LO::LINE1, 1);
+	user1->deployCard(LO::LINE1, 2);
+	user1->deployCard(LO::LINE1, 3);
+	user1->deployCard(LO::LINE1, 4);
+	cout << "score: " << user1->getRoundScore() << endl;
+	user1->banishCard(1);
+	cout << "score: " << user1->getRoundScore() << endl;
+
+	for (auto x : user1->hand) {
+		cout << "hand: " << x << endl;
 	}
 
 	for (auto x : user1->deck) {
 		cout << "deck: " << x << endl;
 	}
 
-	user1->removeAllFromLines();
 	for (auto x : user1->line[0]) {
 		cout << "line1: " << x << endl;
 	}
+
+	for (auto x : user1->grave) {
+		cout << "grave: " << x << endl;
+	}
+
+	game->finishRound();
+
+	cout << "===========" << endl;
+
+	for (auto x : user1->hand) {
+		cout << "hand: " << x << endl;
+	}
+
+	for (auto x : user1->deck) {
+		cout << "deck: " << x << endl;
+	}
+
+	for (auto x : user1->line[0]) {
+		cout << "line1: " << x << endl;
+	}
+
+	for (auto x : user1->grave) {
+		cout << "grave: " << x << endl;
+	}
+
+	cout << "score: " << user1->getRoundScore() << endl;
+
+	skillMap.init();
+	skill s = skillMap.getSkill(SKILL::CONSUME);
+	s(user1->cardMap[user1->deck[1]], 2);
+	s = skillMap.getSkill(SKILL::SPAWN);
+	s(user1->cardMap[user1->deck[1]], 4);
 
 	system("pause");
 	return 0;
