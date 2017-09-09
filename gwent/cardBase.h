@@ -20,6 +20,11 @@ public:
 	int is_leader;
 	int skill;
 	int deploySkill;
+	// TODO: 초기화 및 json , json 파싱 작업 안했음
+	int deathWishSkill; 
+	int skillData;
+	int deplouSkillData;
+	int deathWishSkillData;
 
 	CardBase(std::string _name = "", int _armor = 0, int _camp = 0, int _is_doomed = 0, int _is_leader = 0, int _is_stubborn = 0,
 		int _line = 0, int _no = 0, int _power = 0, int _strength = 0, int _type = 0, int _skill = 0, int _deploySkill = 0) :

@@ -1,7 +1,7 @@
 #ifndef ENUM_H
 #define ENUM_H
 
-enum LO { // location of a card. 실재 카드 위치. TODO: lineWeather은 없음
+enum LO { // location of a card. 실제 카드 위치. TODO: lineWeather은 없음
 	DECK, HAND, GRAVE, LINE1, LINE2, LINE3, GRAVE_ENEMY
 };
 
@@ -21,6 +21,8 @@ enum LINE {
 enum RESULT {
 	USER0WIN = 1, USER1WIN, DRAW
 };
+
+enum SKILLKIND { NORMAL, DEPLOY, DEATHWISH };
 
 /* figures 순서 */
 //"armor": 0,

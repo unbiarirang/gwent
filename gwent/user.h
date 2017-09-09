@@ -52,23 +52,31 @@ public:
 	void deployCard(LO lo, ID cardID);	// deploy the card to line 1 or 2 or 3
 	void deployEventCard(ID cardID);	// deploy the event card
 	void banishCard(ID cardID);			// remove the card from the game
-	void removeAllCardFromLines();		// remove all cards from all lines;
+	void destroyCard(ID cardID);		// move the card from field to grave
+	Card* spawnCard(int no);			// spawn card
+	void removeAllCardFromLines();		// remove all cards from all lines
 
 	bool isAt(LO lo, ID cardID);
 	void removeFrom(LO lo, ID cardID);	// 점수 계산 자동으로 해중
 	void insertInto(LO lo, ID cardID);	// 점수 계산 자동으로 해줌
+	LO findLine(ID cardID);
 
 	/* treat private variables */
 	bool getIsGiveUp();
 	void setIsGiveUp(bool v);
 	void setRound(int r);
-	int getRoundScore();				// get playing round score
-	void addRoundScore(int v);			// add or sub playing round score
-	void addRoundScoreForLine(LO lo, int v);	// add or sub playing round score for a line
+	int getRoundScore();						// get playing round score
+	void changeRoundScore(int v);				// add or sub playing round score
+	void changeRoundScoreForLine(LO lo, int v);	// add or sub playing round score for a line
 
 	/* others */
 	void myTurn();						// play game in my turn (draw and deploy)
-	void useSkill(ID cardID, int value);
+	void useSkill(SKILLKIND kind, ID cardID, int value);
+
+	ID getHighest();					// select the highest randomly if there are more than one higest
+	ID getLowest();						// select the lowest randomly if there are more than one lowest
+
+	Card* getCardFromID(ID cardID);
 };
 
 #endif

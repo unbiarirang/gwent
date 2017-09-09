@@ -2,6 +2,7 @@
 #include "skill.h"
 
 extern SkillMap skillMap;
+extern std::vector<CardBase*> cardCollection;
 
 std::ostream& operator<<(std::ostream& os, const User* m)
 {
@@ -54,12 +55,38 @@ void User::deployEventCard(ID cardID)
 
 void User::banishCard(ID cardID) // TODO: lineWeather에 있는 카드는 추방이 안됨
 {
-	for (int i = LO::DECK; i < LO::LINE3; i++) {
-		if (isAt(LO(i), cardID)) {
-			removeFrom(LO(i), cardID);
+	LO lo = findLine(cardID);
+	removeFrom(lo, cardID);
+}
+
+void User::destroyCard(ID cardID)
+{
+	LO lo = findLine(cardID);
+
+	// if the card is doomed then banish the card
+	if (getCardFromID(cardID)->is_doomed) {
+		banishCard(cardID);
+		return;
+	}
+
+	removeFrom(lo, cardID);
+	insertInto(LO::GRAVE, cardID);
+}
+
+Card* User::spawnCard(int no)
+{
+	CardBase* cb = nullptr;
+	for (auto cardBase : cardCollection) {
+		if ((*cardBase).no == no) {
+			cb = cardBase;
 			break;
 		}
 	}
+	ID newID = util::getID();
+	Card* newCard = new Card(cb, newID);
+	cardMap[newID] = newCard;
+
+	return newCard;
 }
 
 void User::removeAllCardFromLines()
@@ -120,8 +147,8 @@ void User::removeFrom(LO lo, ID cardID)
 
 	// calculate score if the card was on lines
 	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
-		addRoundScore(-cardMap[cardID]->strength);
-		addRoundScoreForLine(lo, -cardMap[cardID]->strength);
+		changeRoundScore(-cardMap[cardID]->strength);
+		changeRoundScoreForLine(lo, -cardMap[cardID]->strength);
 	}
 
 	// remove the element from vector
@@ -151,13 +178,25 @@ void User::insertInto(LO lo, ID cardID)
 
 	// calculate score if the card is going to be deployed
 	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
-		addRoundScore(cardMap[cardID]->strength);
-		addRoundScoreForLine(lo, cardMap[cardID]->strength);
+		changeRoundScore(cardMap[cardID]->strength);
+		changeRoundScoreForLine(lo, cardMap[cardID]->strength);
 	}
 
 	// insert the element into vector
 	if (!isAt(lo, cardID))
 		(*v).push_back(cardID);
+}
+
+LO User::findLine(ID cardID)
+{
+	LO lo;
+	for (int i = LO::LINE1; i <= LO::LINE3; i++) {
+		if (isAt(LO(i), cardID)) {
+			lo = LO(i);
+			return lo;
+		}
+	}
+	return LO();
 }
 
 /* treat private variables */
@@ -176,12 +215,12 @@ int User::getRoundScore()
 	return score[round - 1];
 }
 
-void User::addRoundScore(int v)
+void User::changeRoundScore(int v)
 {
 	score[round - 1] = score[round - 1] + v;
 }
 
-void User::addRoundScoreForLine(LO lo, int v)
+void User::changeRoundScoreForLine(LO lo, int v)
 {
 	scoreForLine[round - 1][lo - 3] = v; // LINE1 = 3
 }
@@ -212,9 +251,67 @@ void User::myTurn()
 	// 그리고 턴을 넘기기 emit signal: 턴 넘기기 slot: Game.nextTurn
 }
 
-void User::useSkill(ID cardID, int value)
+void User::useSkill(SKILLKIND kind, ID cardID, int value)
 {
-	Card* card = cardMap[cardID];
-	skill f = skillMap.getSkill(SKILL(card->skill));
-	f(card, value);
+	Card* card = getCardFromID(cardID);
+	skill f = nullptr;
+
+	switch (kind) {
+	case SKILLKIND::NORMAL:
+		f = skillMap.getSkill(SKILL(card->skill)); break;
+	case SKILLKIND::DEPLOY:
+		f = skillMap.getSkill(SKILL(card->deploySkill)); break;
+	case SKILLKIND::DEATHWISH:
+		f = skillMap.getSkill(SKILL(card->deathWishSkill)); break;
+	}
+
+	f(this, card, value);
+}
+
+ID User::getHighest()
+{
+	ID highestCardID;
+	int max = 0;
+	for (int i = 0; i <= 3; i++) {
+		for (auto id : line[i]) {
+			if (cardMap[id]->getStrength() > max) {
+				max = cardMap[id]->getStrength();
+				highestCardID = id;
+			} else if (cardMap[id]->getStrength() < max) {}
+			else {
+				if (util::getRandNumBetween(0, 1)) {	// randomly select one
+					max = cardMap[id]->getStrength();
+					highestCardID = id;
+				}
+			}
+		}
+	}
+	return highestCardID;
+}
+
+ID User::getLowest()
+{
+	ID lowestCardID;
+	int min = 1000;
+	for (int i = 0; i <= 3; i++) {
+		for (auto id : line[i]) {
+			if (cardMap[id]->getStrength() < min) {
+				min = cardMap[id]->getStrength();
+				lowestCardID = id;
+			}
+			else if (cardMap[id]->getStrength() > min) {}
+			else {
+				if (util::getRandNumBetween(0, 1)) {	// randomly select one
+					min = cardMap[id]->getStrength();
+					lowestCardID = id;
+				}
+			}
+		}
+	}
+	return lowestCardID;
+}
+
+Card * User::getCardFromID(ID cardID)
+{
+	return cardMap[cardID];
 }

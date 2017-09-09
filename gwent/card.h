@@ -14,9 +14,15 @@ private:
 
 public:
 	Card(CardBase* cb, ID _id) :
-		CardBase(cb), u_id(_id), u_strength(0), u_armor(0) {};
+		CardBase(cb), u_id(_id), u_strength(cb->strength), u_armor(cb->armor) {};
 
 	friend std::ostream& operator<<(std::ostream& os, const Card* m);
+
+	ID getID();
+	int getStrength();
+	int getArmor();
+	void changeStrength(int v);
+	void changeArmor(int v);
 };
 
 #endif // !CARD_H

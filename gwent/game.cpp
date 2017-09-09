@@ -1,15 +1,5 @@
 #include "game.h"
 
-int Game::getHighest()
-{
-	return 0;
-}
-
-int Game::getLowest()
-{
-	return 0;
-}
-
 User* Game::getUser(int i)
 {
 	if (i != 0 && i != 1)

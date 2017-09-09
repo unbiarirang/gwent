@@ -35,7 +35,5 @@ public:
 	void removeLineWeather(User* u, int i);
 
 	User* getUser(int i);
-	int getHighest();
-	int getLowest();
 };
 #endif // !GAME_H

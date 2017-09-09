@@ -1,5 +1,6 @@
 #include "json/json.h"
 
+#include "user.h"
 #include "game.h"
 #include "skill.h"
 
@@ -77,7 +78,8 @@ int main() {
 	cout << game->getUser(0) << game->getUser(1) << endl;
 
 	game->setCardsToDeck();
-	user1->drawCard(10);
+	user1->drawCard(20);
+	user2->drawCard(20);
 
 	for (auto x : user1->hand) {
 		cout << "hand: " << x << endl;
@@ -87,13 +89,10 @@ int main() {
 		cout <<"deck: "<<  x << endl;
 	}
 
-	user1->deployCard(LO::LINE1, 1);
 	user1->deployCard(LO::LINE1, 2);
 	user1->deployCard(LO::LINE1, 3);
 	user1->deployCard(LO::LINE1, 4);
 	cout << "score: " << user1->getRoundScore() << endl;
-	user1->banishCard(1);
-	cout << "score: " << user1->getRoundScore() << endl;
 
 	for (auto x : user1->hand) {
 		cout << "hand: " << x << endl;
@@ -111,33 +110,37 @@ int main() {
 		cout << "grave: " << x << endl;
 	}
 
-	game->finishRound();
+	user2->deployCard(LO::LINE1, 21);
+	user1->useSkill(SKILLKIND::NORMAL, 1, 1);
 
-	cout << "===========" << endl;
-
-	for (auto x : user1->hand) {
-		cout << "hand: " << x << endl;
+	for (auto x : user2->hand) {
+		cout << "2hand: " << x << endl;
 	}
 
-	for (auto x : user1->deck) {
-		cout << "deck: " << x << endl;
+	for (auto x : user2->deck) {
+		cout << "2deck: " << x << endl;
 	}
+
+	for (auto x : user2->grave) {
+		cout << "2grave: " << x << endl;
+	}
+
+	skill s = skillMap.getSkill(SKILL::SPAWN);
+	s(user1, user1->cardMap[1], 1);
 
 	for (auto x : user1->line[0]) {
 		cout << "line1: " << x << endl;
 	}
 
+	user1->destroyCard(41);
+
 	for (auto x : user1->grave) {
 		cout << "grave: " << x << endl;
 	}
 
-	cout << "score: " << user1->getRoundScore() << endl;
-
-	skillMap.init();
-	skill s = skillMap.getSkill(SKILL::CONSUME);
-	s(user1->cardMap[user1->deck[1]], 2);
-	s = skillMap.getSkill(SKILL::SPAWN);
-	s(user1->cardMap[user1->deck[1]], 4);
+	for (auto x : user1->line[0]) {
+		cout << "line1: " << x << endl;
+	}
 
 	system("pause");
 	return 0;
