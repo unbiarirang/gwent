@@ -7,11 +7,11 @@
 #include <map>
 #include <iostream>
 
-typedef void (*skill)(User*, Card*, int);
+typedef void (*skill)(User*, ID, ID, LO, int);
 
 // 스킬이 없으면 -1로 표기
 enum SKILL {	
-	CONSUME,			// 흡수
+	CONSUME = 1,		// 흡수
 	SPAWN,				// 생성
 	DAMAGE,				// 자신이 입는 피해
 	GETARMOR,			// 방어력 획득
@@ -24,23 +24,50 @@ enum SKILL {
 	DRAWCARD,			// 카드 뽑기
 	STRENGTHEN,			// 강화
 	RESURRECT,			// 부활
-	DESTROY				// 파괴
+	DESTROY,			// 파괴
+	DESTROYHIGHEST,		// 가장 강한 유닛 파괴
+
+	FIRSTLIGHT,
+	BITINGFROST,
+	IMPENETRABLEFOG,
+	TORRENTIALRAIN,
+	LACERATE,
+	COMMANDERSHORN,
+	BEKKERSTWISTEDMIRROR,
+	GERALTIGNI,
+	ROACH,
+	THUNDERBOLTPOSITION
 };
 
-void consume(User* user,Card* card, int value);
-void spawn(User* user, Card* card, int value);
-void damage(User* user, Card* card, int value);
-void getArmor(User* user, Card* card, int value);
-void summon(User* user, Card* card, int value);
-void attack(User* user, Card* card, int value);
-void boostPower(User* user, Card* card, int value);
-void boost(User* user, Card* card, int value);
-void removeWeather(User* user, Card* card, int value);
-void moveToEnemyGrave(User* user, Card* card, int value);
-void drawCard(User* user, Card* card, int value);
-void strengthen(User* user, Card* card, int value);
-void resurrect(User* user, Card* card, int value);
-void destoryHighest(User* user, Card* card, int value);
+/* BASIC */
+void consume(User* user, ID cardID, ID targetID, LO location, int data);
+void spawn(User* user, ID cardID, ID targetID, LO location, int data);
+void damage(User* user, ID cardID, ID targetID, LO location, int data);
+void getArmor(User* user, ID cardID, ID targetID, LO location, int data);
+void summon(User* user, ID cardID, ID targetID, LO location, int data);
+void attack(User* user, ID cardID, ID targetID, LO location, int data);
+void boostPower(User* user, ID cardID, ID targetID, LO location, int data);
+void boost(User* user, ID cardID, ID targetID, LO location, int data);
+void removeWeather(User* user, ID cardID, ID targetID, LO location, int data);
+void moveToEnemyGrave(User* user, ID cardID, ID targetID, LO location, int data);
+void drawCard(User* user, ID cardID, ID targetID, LO location, int data);
+void strengthen(User* user, ID cardID, ID targetID, LO location, int data);
+void resurrect(User* user, ID cardID, ID targetID, LO location, int data);
+void destroy(User* user, ID cardID, ID targetID, LO location, int data);
+void destroyHighest(User* user, ID cardID, ID targetID, LO location, int data);
+void rally(User* user, ID cardID, ID targetID, LO location, int data);
+
+/* SPECIFIC event card */
+void firstLight(User* user, ID cardID, ID targetID, LO location, int data);
+void bitingFrost(User* user, ID cardID, ID targetID, LO location, int data);
+void impenetrableFog(User* user, ID cardID, ID targetID, LO location, int data);
+void torrentialRain(User* user, ID cardID, ID targetID, LO location, int data);
+void lacerate(User* user, ID cardID, ID targetID, LO location, int data);
+void commandersHorn(User* user, ID cardID, ID targetID, LO location, int data);
+void bekkersTwistedMirror(User* user, ID cardID, ID targetID, LO location, int data);
+void geraltIgni(User* user, ID cardID, ID targetID, LO location, int data);
+void roach(User* user, ID cardID, ID targetID, LO location, int data);
+void thunderboltPosition(User* user, ID cardID, ID targetID, LO location, int data);
 
 class SkillMap {
 private:

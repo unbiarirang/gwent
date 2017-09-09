@@ -36,17 +36,21 @@ void User::discardCard(ID cardID)
 
 void User::deployCard(LO lo, ID cardID)
 {
-	Card* card = cardMap[cardID];
+	Card* card = getCardFromID(cardID);
 	// wrong location to deploy card
 	if (!(lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3))
 		return;
 
 	// wrong location to deploy card
-	if ((card->line != LINE::ANY) && (card->line != lo - 2))
+	if (card->line != LINE::ANY && card->line != LINE::WEATHER && card->line != LINE::EVENT
+		&& (card->line != lo - 2))
 		return;
 
 	removeFrom(LO::HAND, cardID);
 	insertInto(lo, cardID);
+
+	//targetID 입력 받아야함
+	useSkill(SKILLKIND::DEPLOY, cardID, 0, lo);
 }
 
 void User::deployEventCard(ID cardID)
@@ -62,6 +66,9 @@ void User::banishCard(ID cardID) // TODO: lineWeather에 있는 카드는 추방이 안됨
 void User::destroyCard(ID cardID)
 {
 	LO lo = findLine(cardID);
+
+	if (lo != LO::LINE1 && lo != LO::LINE2 && lo != LO::LINE3) // the card is not on field
+		return;
 
 	// if the card is doomed then banish the card
 	if (getCardFromID(cardID)->is_doomed) {
@@ -146,10 +153,8 @@ void User::removeFrom(LO lo, ID cardID)
 	}
 
 	// calculate score if the card was on lines
-	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
-		changeRoundScore(-cardMap[cardID]->strength);
-		changeRoundScoreForLine(lo, -cardMap[cardID]->strength);
-	}
+	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3)
+		changeRoundScoreForLine(lo, -getCardFromID(cardID)->getStrength());
 
 	// remove the element from vector
 	if (isAt(lo, cardID))
@@ -177,10 +182,8 @@ void User::insertInto(LO lo, ID cardID)
 	}
 
 	// calculate score if the card is going to be deployed
-	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
-		changeRoundScore(cardMap[cardID]->strength);
-		changeRoundScoreForLine(lo, cardMap[cardID]->strength);
-	}
+	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3)
+		changeRoundScoreForLine(lo, getCardFromID(cardID)->strength);
 
 	// insert the element into vector
 	if (!isAt(lo, cardID))
@@ -215,14 +218,15 @@ int User::getRoundScore()
 	return score[round - 1];
 }
 
-void User::changeRoundScore(int v)
-{
-	score[round - 1] = score[round - 1] + v;
-}
+//void User::changeRoundScore(int v)
+//{
+//	score[round - 1] += v;
+//}
 
 void User::changeRoundScoreForLine(LO lo, int v)
 {
-	scoreForLine[round - 1][lo - 3] = v; // LINE1 = 3
+	scoreForLine[round - 1][lo - 3] += v; // LINE1 = 3
+	score[round - 1] += v;
 }
 
 void User::setRound(int r)
@@ -246,26 +250,60 @@ void User::myTurn()
 
 	drawCard(1);
 
+	// 날씨 효과
 	// timer가 돌아갈 동안 카드를 선택해서 내기 deployCard
 	// 만약 시간이 다 됐으면 hand에서 카드 무작위로 한장 버리기
 	// 그리고 턴을 넘기기 emit signal: 턴 넘기기 slot: Game.nextTurn
 }
 
-void User::useSkill(SKILLKIND kind, ID cardID, int value)
+void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 {
 	Card* card = getCardFromID(cardID);
 	skill f = nullptr;
+	int data = 0;
 
 	switch (kind) {
-	case SKILLKIND::NORMAL:
-		f = skillMap.getSkill(SKILL(card->skill)); break;
-	case SKILLKIND::DEPLOY:
-		f = skillMap.getSkill(SKILL(card->deploySkill)); break;
-	case SKILLKIND::DEATHWISH:
-		f = skillMap.getSkill(SKILL(card->deathWishSkill)); break;
+	case SKILLKIND::NORMAL: {
+		f = skillMap.getSkill(SKILL(card->skill)); 
+		data = card->skillData;
+		break;
+	}
+	case SKILLKIND::DEPLOY: {
+		f = skillMap.getSkill(SKILL(card->deploySkill));
+		data = card->deploySkillData;
+		break;
+	}
+	case SKILLKIND::DEATHWISH: {
+		f = skillMap.getSkill(SKILL(card->deathWishSkill));
+		data = card->deathWishSkillData;
+		break;
+	}
 	}
 
-	f(this, card, value);
+	if (f == nullptr) return;			//no skill
+
+	f(this, cardID, targetID, location, data);
+
+	if (card->line == LINE::EVENT) {	//remove the event card
+		removeFrom(findLine(cardID), cardID);
+		insertInto(LO::GRAVE, cardID);
+	}
+}
+
+void User::changeStrength(ID cardID, int v)
+{
+	Card* card = getCardFromID(cardID);
+
+	int prev_str = card->getStrength();
+	int is_dead = card->changeStrength(v);
+
+	if (is_dead) {
+		destroyCard(cardID);
+		changeRoundScoreForLine(findLine(cardID), -prev_str);
+		return;
+	}
+
+	changeRoundScoreForLine(findLine(cardID), v);
 }
 
 ID User::getHighest()
@@ -274,13 +312,14 @@ ID User::getHighest()
 	int max = 0;
 	for (int i = 0; i <= 3; i++) {
 		for (auto id : line[i]) {
-			if (cardMap[id]->getStrength() > max) {
-				max = cardMap[id]->getStrength();
+			Card* card = getCardFromID(id);
+			if (card->getStrength() > max) {
+				max = card->getStrength();
 				highestCardID = id;
-			} else if (cardMap[id]->getStrength() < max) {}
+			} else if (card->getStrength() < max) {}
 			else {
 				if (util::getRandNumBetween(0, 1)) {	// randomly select one
-					max = cardMap[id]->getStrength();
+					max = card->getStrength();
 					highestCardID = id;
 				}
 			}
@@ -295,14 +334,15 @@ ID User::getLowest()
 	int min = 1000;
 	for (int i = 0; i <= 3; i++) {
 		for (auto id : line[i]) {
-			if (cardMap[id]->getStrength() < min) {
-				min = cardMap[id]->getStrength();
+			Card* card = getCardFromID(id);
+			if (card->getStrength() < min) {
+				min = card->getStrength();
 				lowestCardID = id;
 			}
-			else if (cardMap[id]->getStrength() > min) {}
+			else if (card->getStrength() > min) {}
 			else {
 				if (util::getRandNumBetween(0, 1)) {	// randomly select one
-					min = cardMap[id]->getStrength();
+					min = card->getStrength();
 					lowestCardID = id;
 				}
 			}
@@ -314,4 +354,14 @@ ID User::getLowest()
 Card * User::getCardFromID(ID cardID)
 {
 	return cardMap[cardID];
+}
+
+ID User::getWeatherCardIDFromLine(LO lo)
+{
+	for (auto id : line[lo - 3]) {
+		if (getCardFromID(id)->line == LINE::WEATHER) {
+			return id;
+		}
+	}
+	return 0;
 }

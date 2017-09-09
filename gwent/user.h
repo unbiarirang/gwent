@@ -19,7 +19,7 @@ public:
 	std::vector<ID> hand;
 	std::vector<ID> grave;
 	std::vector<ID> line[3];
-	ID lineWeather[3];			// lineWeather[line]
+	ID lineWeather[3];			// lineWeather[line] TODO: 없에자. 그냥 날씨도 다 라인에 넣자
 
 private:
 	int score[3];				// score[round] 시시각각 변하는 점수
@@ -66,17 +66,19 @@ public:
 	void setIsGiveUp(bool v);
 	void setRound(int r);
 	int getRoundScore();						// get playing round score
-	void changeRoundScore(int v);				// add or sub playing round score
+	//void changeRoundScore(int v);				// add or sub playing round score
 	void changeRoundScoreForLine(LO lo, int v);	// add or sub playing round score for a line
 
 	/* others */
 	void myTurn();						// play game in my turn (draw and deploy)
-	void useSkill(SKILLKIND kind, ID cardID, int value);
+	void useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location);
+	void changeStrength(ID cardID, int v);
 
-	ID getHighest();					// select the highest randomly if there are more than one higest
+	ID getHighest();					// select the highest randomly if there are more than one higest FIXME: 벡터에 넣고 하나 뽑아야함
 	ID getLowest();						// select the lowest randomly if there are more than one lowest
 
 	Card* getCardFromID(ID cardID);
+	ID getWeatherCardIDFromLine(LO lo);
 };
 
 #endif

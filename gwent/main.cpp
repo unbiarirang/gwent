@@ -27,7 +27,7 @@ bool ReadFromFile(const char* filename, char* buffer, int len) {
 }
 
 int ReadFromJson() {
-	const int BufferLength = 2048; // be careful
+	const int BufferLength = 10000; // be careful
 	char readBuffer[BufferLength] = { 0, };
 
 	if (ReadFromFile("card.json", readBuffer, BufferLength) == false) {
@@ -58,7 +58,8 @@ int ReadFromJson() {
 			figures.push_back(fg[j].asInt());
 		}
 		CardBase* card = new CardBase(name, figures[0], figures[1], figures[2],figures[3], 
-			figures[4], figures[5], figures[6], figures[7], figures[8], figures[9], figures[10], figures[11]);
+			figures[4], figures[5], figures[6], figures[7], figures[8], figures[9], figures[10], figures[11],
+			figures[12], figures[13], figures[14], figures[15]);
 		cardCollection.push_back(card);
 
 		cout << card->name << endl;
@@ -78,68 +79,54 @@ int main() {
 	cout << game->getUser(0) << game->getUser(1) << endl;
 
 	game->setCardsToDeck();
-	user1->drawCard(20);
-	user2->drawCard(20);
+	user1->drawCard(30);
+	user2->drawCard(30);
+
+	user2->deployCard(LO::LINE1, 31);
+	cout << "score: " << user2->getRoundScore() << endl;
+	user1->deployCard(LO::LINE1, 22);
+	user1->deployCard(LO::LINE2, 23);
+	cout << "score: " << user2->getRoundScore() << endl;
 
 	for (auto x : user1->hand) {
 		cout << "hand: " << x << endl;
 	}
-
-	for (auto x : user1->deck) {
-		cout <<"deck: "<<  x << endl;
-	}
-
-	user1->deployCard(LO::LINE1, 2);
-	user1->deployCard(LO::LINE1, 3);
-	user1->deployCard(LO::LINE1, 4);
-	cout << "score: " << user1->getRoundScore() << endl;
-
-	for (auto x : user1->hand) {
-		cout << "hand: " << x << endl;
-	}
-
 	for (auto x : user1->deck) {
 		cout << "deck: " << x << endl;
 	}
-
 	for (auto x : user1->line[0]) {
 		cout << "line1: " << x << endl;
 	}
-
+	for (auto x : user1->line[1]) {
+		cout << "line2: " << x << endl;
+	}
 	for (auto x : user1->grave) {
 		cout << "grave: " << x << endl;
 	}
+	cout << "=====================" << endl;
 
-	user2->deployCard(LO::LINE1, 21);
-	user1->useSkill(SKILLKIND::NORMAL, 1, 1);
+	//cout << "score: " << user1->getRoundScore() << endl;
 
-	for (auto x : user2->hand) {
-		cout << "2hand: " << x << endl;
+	skill s = skillMap.getSkill(SKILL::ATTACK);
+	s(user1, 1, 31, LO::LINE1, 2);
+	cout << "score: " << user2->getRoundScore() << endl;
+
+	user1->deployCard(LO::LINE1, 21);
+
+	for (auto x : user1->hand) {
+		cout << "hand: " << x << endl;
 	}
-
-	for (auto x : user2->deck) {
-		cout << "2deck: " << x << endl;
+	for (auto x : user1->deck) {
+		cout << "deck: " << x << endl;
 	}
-
-	for (auto x : user2->grave) {
-		cout << "2grave: " << x << endl;
-	}
-
-	skill s = skillMap.getSkill(SKILL::SPAWN);
-	s(user1, user1->cardMap[1], 1);
-
 	for (auto x : user1->line[0]) {
 		cout << "line1: " << x << endl;
 	}
-
-	user1->destroyCard(41);
-
+	for (auto x : user1->line[1]) {
+		cout << "line2: " << x << endl;
+	}
 	for (auto x : user1->grave) {
 		cout << "grave: " << x << endl;
-	}
-
-	for (auto x : user1->line[0]) {
-		cout << "line1: " << x << endl;
 	}
 
 	system("pause");

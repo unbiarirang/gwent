@@ -30,12 +30,17 @@ enum SKILLKIND { NORMAL, DEPLOY, DEATHWISH };
 //"is_doomed": 1,
 //"is_leader": 1,
 //"is_stubborn": 1,
-//"line": 4,			1:근접 2:원거리 3:공성 4:아무곳이나 5:이벤트카드
+//"line": 4,			1:근접 2:원거리 3:공성 4:아무곳이나 5:이벤트카드 6:날씨
 
 //"no": 1,				카드 넘버
 //"power": 0,
 //"strength": 6,
 //"type": 3,			1:브론즈 2:실버 3:골드
-//"skill": ?,
-//"deploySkill": ?
+
+//"skill": 0,
+//"deploySkill": 0,
+//"deathWishSkill": 0,
+//"skillData": 0,
+//"deploySkillData": 0,
+//"deathWishSkillData": 0
 #endif

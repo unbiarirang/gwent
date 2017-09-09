@@ -21,7 +21,7 @@ public:
 	ID getID();
 	int getStrength();
 	int getArmor();
-	void changeStrength(int v);
+	bool changeStrength(int v);	// return is_dead; 쓸 때마다 유닛 죽었는지 확인하고 점수 바꿔줘야함! 
 	void changeArmor(int v);
 };
 

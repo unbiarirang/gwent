@@ -21,9 +21,17 @@ int Card::getArmor()
 	return u_armor;
 }
 
-void Card::changeStrength(int v)
+// return is_dead
+bool Card::changeStrength(int v)
 {
-	u_strength = u_strength + v;
+	u_strength += v;
+
+	if (u_strength <= 0) {	//the unit is destroyed
+		u_strength = 0;
+		return true;
+	}
+
+	return false;
 }
 
 void Card::changeArmor(int v)
