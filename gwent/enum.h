@@ -43,4 +43,9 @@ enum SKILLKIND { NORMAL, DEPLOY, DEATHWISH };
 //"skillData": 0,
 //"deploySkillData": 0,
 //"deathWishSkillData": 0
+
+//"31": {
+//	"name": "Harpy Hatchling",
+//		"figures" : [0, 2, 1, 0, 0, 4, 31, 0, 1, 1, 0, 0, 0, 0, 0, 0]
+//},
 #endif

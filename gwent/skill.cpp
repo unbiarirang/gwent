@@ -2,6 +2,7 @@
 #include "enum.h"
 
 SkillMap skillMap;	// for common use to every source file
+ID topOfDeck = ID(); // for the skill of Geels
 
 void SkillMap::init()
 {
@@ -73,25 +74,27 @@ void consume(User* user, ID cardID, ID targetID = 0, LO location = LO(), int dat
 	user->destroyCard(targetID);				// destroy the target card
 }
 
-// data: target card no
+/*
+@ user
+@ location
+@ data : target card no
+*/
 void spawn(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0) {
-	int targetCardNo = data;
-	Card* card = user->getCardFromID(cardID);
+	Card* newCard = user->spawnCard(data);
+	user->insertInto(location, newCard->getID());
 
-	std::cout << "SKILL::SPAWN 발동카드: " << card << std::endl;
-
-	targetCardNo = 1; // FIXME: 임시 숫자
-	Card* newCard = user->spawnCard(targetCardNo);
-
-	// 클릭으로 라인을 정하던지 자동으로 배치 되던지
-	LO lo = LO::LINE1; // FIXME: 임시 숫자
-	user->insertInto(lo, newCard->getID());
+	//TODO: targetID랑 location 입력 받아야함
+	user->useSkill(SKILLKIND::DEPLOY, newCard->getID(), targetID, location);
 }
 
-// data: damage count
+/*
+@ user
+@ targetID
+@ data
+*/
 void damage(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	user->changeStrength(cardID, -data);
+	user->changeStrength(targetID, -data);
 }
 
 /*
@@ -137,7 +140,7 @@ void summon(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 // data: damage count
 void attack(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	if (user->enemy->getCardFromID(targetID)->line != LINE::WEATHER)
+	if (user->enemy->getCardFromID(targetID) != nullptr) // not weather card
 		user->enemy->changeStrength(targetID, -data);
 }
 
@@ -215,7 +218,10 @@ void destroyHighest(User* user, ID cardID, ID targetID = 0, LO location = LO(), 
 	//}
 }
 
-// data: no use
+/*
+@ user
+@ location
+*/
 void rally(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
 	bool is_exist = false;
@@ -236,15 +242,29 @@ void rally(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 			id = user->deck[cardIndex];
 
 			if (user->getCardFromID(id)->type == TYPE::BRONZE) {
-				user->insertInto(LO::HAND, id);
-				user->removeFrom(LO::DECK, id);
+				user->deployCard(location, id);
 				return;
 			}
 		}
 	}
 }
 
-// data: 0 or 1 (clear skies or rally)
+/*
+@ user
+@ location
+@ data : target card no
+*/
+void spawnWeather(User * user, ID cardID, ID targetID, LO location, int data)
+{
+	Card* newCard = user->enemy->spawnCard(data);
+	user->enemy->insertInto(location, newCard->getID());
+}
+
+/*
+@ user
+@ location
+@ data: 0 or 1 (clear skies or rally)
+*/
 void firstLight(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
 	// clear skies
@@ -255,16 +275,21 @@ void firstLight(User * user, ID cardID, ID targetID, LO location = LO(), int dat
 		return;
 	}
 
+	location = LO::LINE1; // FIXME: 입력 받아야함
 	// rally
-	rally(user, cardID, targetID, location, 0);
+	rally(user, cardID, targetID, location, data);
 }
 
-// data: attack power
+/*
+@ user
+@ location
+@ data : attack power
+*/
 void bitingFrost(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
-	ID lowestID = user->enemy->getLowestFromLine(location);
+	ID lowestID = user->getLowestFromLine(location);
 
-	attack(user, cardID, lowestID, location, data);
+	damage(user, cardID, lowestID, location, data);
 }
 
 // data: attack power
@@ -344,6 +369,9 @@ void commandersHorn(User * user, ID cardID, ID targetID, LO location = LO(), int
 	}
 }
 
+/*
+@ user
+*/
 void bekkersTwistedMirror(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
 	ID highestID = user->getHighest();
@@ -355,7 +383,7 @@ void bekkersTwistedMirror(User * user, ID cardID, ID targetID, LO location = LO(
 	if (user->getCardFromID(highestID) != nullptr) {
 		changeValue = user->getCardFromID(highestID)->getStrength();
 		if (changeValue > 10) changeValue = 10;
-		damage(user, highestID, targetID, location, changeValue);
+		damage(user, cardID, highestID, location, changeValue);
 	} else {
 		changeValue = user->enemy->getCardFromID(highestID)->getStrength();
 		if (changeValue > 10) changeValue = 10;
@@ -369,6 +397,10 @@ void bekkersTwistedMirror(User * user, ID cardID, ID targetID, LO location = LO(
 		boost(user->enemy, cardID, lowestID, location, changeValue);
 }
 
+/*
+@ user
+@ cardID
+*/
 void geraltIgni(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
 	LO lo = user->findLine(cardID);
@@ -448,24 +480,131 @@ void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO()
 	boost(user, cardID, unitIDs[p], location, data);
 }
 
+/*
+@ user
+@ location
+@ data : 22:bitingFrost, 23:impenetrableFog, 24:torrentialRain
+*/
 void dagon(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	data = 22; // FIXME: 날씨 배치할 location이랑 data 받아야하는데 어떻게 받을지 고민
+	spawn(user->enemy, cardID, targetID, location, data);
 }
 
+/*
+@ user
+@ cardID
+*/
 void foglet(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	User* enemy = user->enemy;
+	bool is_fog = false;
+
+	//whether there is fog on the enemy's line
+	for (int i = LO::LINE1; i <= LO::LINE3; i++) {
+		Card* card = enemy->getCardFromID(enemy->getWeatherCardIDFromLine(LO(i)));
+		if (card != nullptr) {
+			if (card->no == 23) {  //impenetrableFog
+				is_fog = true;
+				break;
+			}
+		}
+	}
+
+	if (!is_fog) return;
+
+	//look up the deck first
+	for (auto id : user->deck) {
+		if (user->getCardFromID(id)->no == 23) {
+			user->deployCard(user->findLine(cardID), id);
+			return;
+		}
+	}
+
+	//then look up the grave
+	for (auto id : user->grave) {
+		if (user->getCardFromID(id)->no == 23) {
+			user->deployCard(user->findLine(cardID), id);
+			return;
+		}
+	}
 }
 
 void geels(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	std::vector<ID> silverIDs = std::vector<ID>();
+	for (auto id : user->deck) {
+		if (user->getCardFromID(id)->type == TYPE::SILVER) {
+			silverIDs.push_back(id);
+		}
+	}
+
+	std::vector<ID> goldIDs = std::vector<ID>();
+	for (auto id : user->deck) {
+		if (user->getCardFromID(id)->type == TYPE::GOLD) {
+			goldIDs.push_back(id);
+		}
+	}
+
+	int cardNum, cardIndex;
+	ID silverCardID = ID();
+
+	if (silverIDs.size() != 0) {
+		cardNum = silverIDs.size();
+		cardIndex = util::getRandNumBetween(0, cardNum - 1);
+		silverCardID = silverIDs[cardIndex];
+
+		user->insertInto(LO::HAND, silverCardID);
+		user->removeFrom(LO::DECK, silverCardID);
+	}
+
+	ID goldCardID = ID();
+	if (goldIDs.size() != 0) {
+		cardNum = goldIDs.size();
+		cardIndex = util::getRandNumBetween(0, cardNum - 1);
+		goldCardID = goldIDs[cardIndex];
+
+		user->insertInto(LO::HAND, goldCardID);
+		user->removeFrom(LO::DECK, goldCardID);
+	}
+
+	// TODO:여기서 데이터를 입력받아야함. 실버카드를 고를지 골드카드를 고를지
+	// TODO: 어디다가 둘지도 받아야함 location
+	data = TYPE::SILVER;
+	LO lo = LO::LINE1;
+
+	if (data == TYPE::SILVER && silverCardID != ID()) {
+		user->deployCard(lo, silverCardID);
+		user->discardCard(goldCardID);
+		topOfDeck = goldCardID;
+	} else if (data == TYPE::GOLD && goldCardID != ID()) {
+		user->deployCard(lo, goldCardID);
+		user->discardCard(silverCardID);
+		topOfDeck = silverCardID;
+	}
 }
 
+/*
+@ user
+@ data: spawn card no (Harpy Egg ID)
+*/
 void celaenoHarpy(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
 }
 
+/*
+@ user
+@ cardID
+@ data : target card no
+*/
 void woodlandSpirit(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	spawn(user->enemy, cardID, targetID, user->findLine(cardID), 23); // spawn fog
 }
 
 void earthElemental(User * user, ID cardID, ID targetID, LO location, int data)
@@ -518,4 +657,6 @@ void wildHuntRider(User * user, ID cardID, ID targetID, LO location, int data)
 
 void harpyEgg(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	// TODO: 하피 해츨링 아직 json에 추가 안함
+	spawn(user, cardID, targetID, user->findLine(cardID), 31);
 }

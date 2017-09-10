@@ -3,6 +3,7 @@
 
 extern SkillMap skillMap;
 extern std::vector<CardBase*> cardCollection;
+extern ID topOfDeck;
 
 std::ostream& operator<<(std::ostream& os, const User* m)
 {
@@ -19,6 +20,15 @@ void User::drawCard(int count)
 {
 	int cardNum, cardIndex;
 	ID cardID;
+
+	// for the skill of Geels
+	if (topOfDeck != ID()) {
+		insertInto(LO::HAND, topOfDeck);
+		removeFrom(LO::DECK, topOfDeck);
+		topOfDeck = ID();
+		count--;
+	}
+
 	for (int j = 0; j < count; j++) {
 		cardNum = deck.size();
 		cardIndex = util::getRandNumBetween(0, cardNum - 1);
@@ -46,10 +56,15 @@ void User::deployCard(LO lo, ID cardID)
 		&& (card->line != lo - 2))
 		return;
 
-	removeFrom(LO::HAND, cardID);
-	insertInto(lo, cardID);
+	if (card->line == LINE::WEATHER) {	// deploy weather card on the enemy's filed
+		removeFrom(LO::HAND, cardID);
+		enemy->insertInto(lo, cardID);
+	} else {
+		removeFrom(LO::HAND, cardID);
+		insertInto(lo, cardID);
+	}
 
-	//targetID 입력 받아야함
+	//TODO: targetID랑 location 입력 받아야함
 	useSkill(SKILLKIND::DEPLOY, cardID, 0, lo);
 }
 
@@ -67,8 +82,16 @@ void User::destroyCard(ID cardID)
 {
 	LO lo = findLine(cardID);
 
-	if (lo != LO::LINE1 && lo != LO::LINE2 && lo != LO::LINE3) // the card is not on field
+	// the card is not on field
+	if (lo != LO::LINE1 && lo != LO::LINE2 && lo != LO::LINE3)
 		return;
+
+	// weather card
+	if (getCardFromID(cardID) == nullptr) {
+		removeFrom(lo, cardID);
+		insertInto(LO::GRAVE_ENEMY, cardID);
+		return;
+	}
 
 	// if the card is doomed then banish the card
 	if (getCardFromID(cardID)->is_doomed) {
@@ -153,8 +176,10 @@ void User::removeFrom(LO lo, ID cardID)
 	}
 
 	// calculate score if the card was on lines
-	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3)
-		changeRoundScoreForLine(lo, -getCardFromID(cardID)->getStrength());
+	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
+		if (getCardFromID(cardID) == nullptr) {}	// enemy's weather card
+		else { changeRoundScoreForLine(lo, -getCardFromID(cardID)->strength); }	// calculate score if the card is going to be deployed
+	}
 
 	// remove the element from vector
 	if (isAt(lo, cardID))
@@ -181,9 +206,10 @@ void User::insertInto(LO lo, ID cardID)
 		v = &enemy->grave;
 	}
 
-	// calculate score if the card is going to be deployed
-	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3)
-		changeRoundScoreForLine(lo, getCardFromID(cardID)->strength);
+	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
+		if (getCardFromID(cardID) == nullptr) {}	// weather card
+		else { changeRoundScoreForLine(lo, getCardFromID(cardID)->strength); }	// calculate score if the card is going to be deployed
+	}
 
 	// insert the element into vector
 	if (!isAt(lo, cardID))
@@ -282,7 +308,10 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 
 	if (f == nullptr) return;			//no skill
 
-	f(this, cardID, targetID, location, data);
+	if (card->line == LINE::WEATHER)	//apply weather card on the enemy's filed
+		f(this->enemy, cardID, targetID, location, data);
+	else
+		f(this, cardID, targetID, location, data);
 
 	if (card->line == LINE::EVENT) {	//remove the event card
 		removeFrom(findLine(cardID), cardID);
@@ -314,7 +343,7 @@ ID User::getHighest()
 	Card* card;
 
 	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
-		_line = line[lo - 3];
+		_line = getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = getCardFromID(id);
 			//filter weather and event cards
@@ -322,7 +351,7 @@ ID User::getHighest()
 				max = card->getStrength();
 		}
 
-		_line = enemy->line[lo - 3];
+		_line = enemy->getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = enemy->getCardFromID(id);
 			//filter weather and event cards
@@ -332,14 +361,14 @@ ID User::getHighest()
 	}
 
 	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
-		_line = line[lo - 3];
+		_line = getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = getCardFromID(id);
 			if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 				highestCardIDs.push_back(id);
 		}
 
-		_line = enemy->line[lo - 3];
+		_line = enemy->getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = enemy->getCardFromID(id);
 			if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
@@ -363,7 +392,7 @@ ID User::getLowest()
 	Card* card;
 
 	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
-		_line = line[lo - 3];
+		_line = getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = getCardFromID(id);
 			//filter weather and event cards
@@ -371,7 +400,7 @@ ID User::getLowest()
 				min = card->getStrength();
 		}
 
-		_line = enemy->line[lo - 3];
+		_line = enemy->getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = enemy->getCardFromID(id);
 			//filter weather and event cards
@@ -381,14 +410,14 @@ ID User::getLowest()
 	}
 
 	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
-		_line = line[lo - 3];
+		_line = getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = getCardFromID(id);
 			if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 				lowestCardIDs.push_back(id);
 		}
 
-		_line = enemy->line[lo - 3];
+		_line = enemy->getUnitIDs(LO(lo));
 		for (auto id : _line) {
 			card = enemy->getCardFromID(id);
 			if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
@@ -407,16 +436,17 @@ ID User::getLowest()
 ID User::getHighestFromLine(LO lo)
 {
 	std::vector<ID> highestCardIDs;
+	std::vector<ID> unitIDs = getUnitIDs(lo);
 	int max = 0;
 	Card* card;
 
-	for (auto id : line[lo - 3]) {
+	for (auto id : unitIDs) {
 		card = getCardFromID(id);
 		//filter weather and event cards
 		if (card->getStrength() > max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 			max = card->getStrength();
 	}
-	for (auto id : line[lo - 3]) {
+	for (auto id : unitIDs) {
 		card =getCardFromID(id);
 		if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 			highestCardIDs.push_back(id);
@@ -433,16 +463,17 @@ ID User::getHighestFromLine(LO lo)
 ID User::getLowestFromLine(LO lo)
 {
 	std::vector<ID> lowestCardIDs;
+	std::vector<ID> unitIDs = getUnitIDs(lo);
 	int min = 1000;
 	Card* card;
 
-	for (auto id : line[lo - 3]) {
+	for (auto id : unitIDs) {
 		card = getCardFromID(id);
 		//filter weather and event cards
 		if (card->getStrength() < min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 			min = card->getStrength();
 	}
-	for (auto id : line[lo - 3]) {
+	for (auto id : unitIDs) {
 		card = getCardFromID(id);
 		if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 			lowestCardIDs.push_back(id);
@@ -464,11 +495,11 @@ Card * User::getCardFromID(ID cardID)
 ID User::getWeatherCardIDFromLine(LO lo)
 {
 	for (auto id : line[lo - 3]) {
-		if (getCardFromID(id)->line == LINE::WEATHER) {
+		if (getCardFromID(id) == nullptr) { // 상대방 카드라 내 카드 정보에 없음
 			return id;
 		}
 	}
-	return 0;
+	return ID();
 }
 
 std::vector<ID> User::getUnitIDs(LO lo)
@@ -476,7 +507,7 @@ std::vector<ID> User::getUnitIDs(LO lo)
 	std::vector<ID> unitIDs = std::vector<ID>();
 
 	for (auto id : line[lo - 3]) {
-		if (getCardFromID(id)->line != LINE::WEATHER && getCardFromID(id)->line != LINE::EVENT)	//filter weather cards
+		if (getCardFromID(id) != nullptr && getCardFromID(id)->line != LINE::EVENT)	//filter weather and event cards
 			unitIDs.push_back(id);
 	}
 

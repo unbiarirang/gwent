@@ -26,8 +26,9 @@ enum SKILL {
 	RESURRECT,			// ºÎÈ°
 	DESTROY,			// ÆÄ±«
 	DESTROYHIGHEST,		// °¡Àå °­ÇÑ À¯´Ö ÆÄ±«
+	SPAWNWEATHER,		// ³¯¾¾ »ý¼º
 
-	FIRSTLIGHT,
+	FIRSTLIGHT = 21,
 	BITINGFROST,
 	IMPENETRABLEFOG,
 	TORRENTIALRAIN,
@@ -38,7 +39,7 @@ enum SKILL {
 	ROACH,
 	THUNDERBOLTPOSITION,
 
-	DAGON,
+	DAGON = 41,
 	FOGLET,
 	GEELS,
 	CELAENOHARPY,
@@ -75,6 +76,7 @@ void resurrect(User* user, ID cardID, ID targetID, LO location, int data);
 void destroy(User* user, ID cardID, ID targetID, LO location, int data);
 void destroyHighest(User* user, ID cardID, ID targetID, LO location, int data);
 void rally(User* user, ID cardID, ID targetID, LO location, int data);
+void spawnWeather(User* user, ID cardID, ID targetID, LO location, int data);
 
 /* SPECIFIC event card */
 void firstLight(User* user, ID cardID, ID targetID, LO location, int data);

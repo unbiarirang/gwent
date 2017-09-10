@@ -80,12 +80,10 @@ int main() {
 
 	game->setCardsToDeck();
 	user1->drawCard(30);
-	user2->drawCard(30);
+	user2->drawCard(15);
 
-	user1->deployCard(LO::LINE1, 1);
-	user2->deployCard(LO::LINE1, 31);
 	user2->deployCard(LO::LINE1, 32);
-	skillMap.getSkill(SKILL::COMMANDERSHORN)(user2, 60, 31, LO::LINE1, 3);
+	user1->deployCard(LO::LINE1, 5);
 	cout << "user1 score: " << user1->getRoundScore() << endl;
 	cout << "user2 score: " << user2->getRoundScore() << endl;
 
@@ -102,12 +100,6 @@ int main() {
 		cout << "user2 grave: " << x << endl;
 	}
 	cout << "=====================" << endl;
-
-	//skill s = skillMap.getSkill(SKILL::ATTACK);
-	//s(user1, 1, 31, LO::LINE1, 2);
-	//cout << "score: " << user2->getRoundScore() << endl;
-
-	user1->deployCard(LO::LINE1, 27);
 
 	cout << "user1 score: " << user1->getRoundScore() << endl;
 	cout << "user2 score: " << user2->getRoundScore() << endl;

@@ -74,6 +74,7 @@ public:
 	void useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location);
 	void changeStrength(ID cardID, int v);
 
+	// 꼭 getUnitIDs 해서 돌기 (날씨카드 땜시)
 	ID getHighest();					// among all units in the field
 	ID getLowest();						// among all units in the field
 	ID getHighestFromLine(LO lo);		// select the highest randomly if there are more than one higest
