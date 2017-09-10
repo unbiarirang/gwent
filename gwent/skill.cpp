@@ -12,7 +12,6 @@ void SkillMap::init()
 	skillMap.setSkill(SKILL::GETARMOR, getArmor);
 	skillMap.setSkill(SKILL::SUMMON, summon);
 	skillMap.setSkill(SKILL::ATTACK, attack);
-	skillMap.setSkill(SKILL::BOOSTPOWER, boostPower);
 	skillMap.setSkill(SKILL::BOOST, boost);
 	skillMap.setSkill(SKILL::REMOVEWEATHER, removeWeather);
 	skillMap.setSkill(SKILL::MOVETOENEMYGRAVE, moveToEnemyGrave);
@@ -63,12 +62,12 @@ void SkillMap::setSkill(SKILL skillName, skill f)
 	map[skillName] = f;
 }
 
-
+/*
+@ user
+@ targetID
+*/
 void consume(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0) {
-	Card* card = user->getCardFromID(cardID);
 	Card* targetCard = user->getCardFromID(targetID);
-
-	std::cout << "SKILL::CONSUME 발동카드: " << card << std::endl;
 
 	user->changeStrength(cardID, targetCard->getStrength());	// boost the card
 	user->destroyCard(targetID);				// destroy the target card
@@ -81,7 +80,11 @@ void consume(User* user, ID cardID, ID targetID = 0, LO location = LO(), int dat
 */
 void spawn(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0) {
 	Card* newCard = user->spawnCard(data);
-	user->insertInto(location, newCard->getID());
+
+	if (newCard->line == LINE::WEATHER)
+		user->enemy->insertInto(location, newCard->getID());
+	else
+		user->insertInto(location, newCard->getID());
 
 	//TODO: targetID랑 location 입력 받아야함
 	user->useSkill(SKILLKIND::DEPLOY, newCard->getID(), targetID, location);
@@ -99,25 +102,30 @@ void damage(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 
 /*
 @ user
-@ targetID
+@ cardID
 @ data
 */
 void getArmor(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	Card* card = user->getCardFromID(targetID);
+	Card* card = user->getCardFromID(cardID);
 	card->changeArmor(data);
 }
 
-// 이거 지금 손에있는거 우선으로 손이나 덱에 있는 카드 한장 소환하는거. 구체적 필요
+/*
+손에있는거 우선으로 손이나 덱에 있는 카드 한장 소환 (발동카드 옆에)
+@ user
+@ location : 소환이 라인을 고를 수 있는 거라면 필요함
+@ data
+*/
 void summon(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
 	int summonCardNo = data;
-	ID summonID;
+	ID summonID = ID();
 	LO lo;
 
 	for (auto id : user->deck) {
 		if (user->getCardFromID(id)->no == data) {
-			summonID = user->getCardFromID(id)->getID();
+			summonID = id;
 			lo = LO::DECK;
 			break;
 		}
@@ -125,16 +133,19 @@ void summon(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 
 	for (auto id : user->hand) {
 		if (user->getCardFromID(id)->no == data) {
-			summonID = user->getCardFromID(id)->getID();
+			summonID = id;
 			lo = LO::HAND;
 			break;
 		}
 	}
 
-	LO line;
-	line = user->findLine(cardID);
+	if (summonID == ID()) return;
+
 	user->removeFrom(lo, summonID);
-	user->insertInto(line, summonID);
+	user->insertInto(location, summonID);
+
+	// targetID와 location 입력 필요 (필요하다면)
+	user->useSkill(SKILLKIND::DEPLOY, summonID, targetID, location);
 }
 
 // data: damage count
@@ -142,11 +153,6 @@ void attack(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 {
 	if (user->enemy->getCardFromID(targetID) != nullptr) // not weather card
 		user->enemy->changeStrength(targetID, -data);
-}
-
-void boostPower(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
-{
-
 }
 
 /*
@@ -158,22 +164,31 @@ void boost(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data 
 	user->changeStrength(targetID, data);
 }
 
-// data: LO enum (LO::LINE1, LO::LINE2, LO::LINE3)
+/*
+@ user
+@ location
+*/
 void removeWeather(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	LO line = location;
-	ID weatherCardID = user->getWeatherCardIDFromLine(line);
-
+	ID weatherCardID = user->getWeatherCardIDFromLine(location);
 	user->destroyCard(weatherCardID);
 }
 
-// from my grave to enemy's grave
+/*
+from my grave to enemy's grave
+@ user
+@ targetID
+*/
 void moveToEnemyGrave(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	user->removeFrom(LO::GRAVE, cardID);
-	user->insertInto(LO::GRAVE_ENEMY, cardID);
+	user->removeFrom(LO::GRAVE, targetID);
+	user->insertInto(LO::GRAVE_ENEMY, targetID);
 }
 
+/*
+@ user
+@ data
+*/
 void drawCard(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
 	int drawCount = data;
@@ -247,17 +262,6 @@ void rally(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 			}
 		}
 	}
-}
-
-/*
-@ user
-@ location
-@ data : target card no
-*/
-void spawnWeather(User * user, ID cardID, ID targetID, LO location, int data)
-{
-	Card* newCard = user->enemy->spawnCard(data);
-	user->enemy->insertInto(location, newCard->getID());
 }
 
 /*
@@ -463,12 +467,12 @@ void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO()
 	if (pos >= unitIDs.size()) //target card not found
 		return;
 
-	getArmor(user, cardID, unitIDs[pos], location, user->getCardFromID(cardID)->skillData);
+	getArmor(user, unitIDs[pos], targetID, location, user->getCardFromID(cardID)->skillData);
 	boost(user, cardID, unitIDs[pos], location, data);
 
 	auto p = pos + 1;
 	if (p < unitIDs.size()) { //there is a card one the right side of the target card
-		getArmor(user, cardID, unitIDs[p], location, user->getCardFromID(cardID)->skillData);
+		getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
 		boost(user, cardID, unitIDs[p], location, data);
 	}
 
@@ -476,7 +480,7 @@ void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO()
 	if (p < 0) //no card one the left side of the target card
 		return;
 
-	getArmor(user, cardID, unitIDs[p], location, user->getCardFromID(cardID)->skillData);
+	getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
 	boost(user, cardID, unitIDs[p], location, data);
 }
 
@@ -488,7 +492,8 @@ void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO()
 void dagon(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	data = 22; // FIXME: 날씨 배치할 location이랑 data 받아야하는데 어떻게 받을지 고민
-	spawn(user->enemy, cardID, targetID, location, data);
+	LO lo = LO::LINE1;
+	spawn(user, cardID, targetID, lo, data);
 }
 
 /*
@@ -604,59 +609,167 @@ void woodlandSpirit(User * user, ID cardID, ID targetID, LO location, int data)
 	spawn(user, cardID, targetID, user->findLine(cardID), data);
 	spawn(user, cardID, targetID, user->findLine(cardID), data);
 	spawn(user, cardID, targetID, user->findLine(cardID), data);
-	spawn(user->enemy, cardID, targetID, user->findLine(cardID), 23); // spawn fog
+	spawn(user->enemy, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData); // spawn fog
 }
 
 void earthElemental(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	spawn(user, cardID, targetID, user->findLine(cardID), data);
+	getArmor(user, cardID, targetID, location, 100); // protect shield
 }
 
 void croneWeavess(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	summon(user, cardID, targetID, user->findLine(cardID), data);
+	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
 }
 
 void croneWhispess(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	summon(user, cardID, targetID, user->findLine(cardID), data);
+	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
 }
 
 void croneBrewess(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	summon(user, cardID, targetID, user->findLine(cardID), data);
+	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
 }
 
 void archgriffin(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	LO lo = LO::LINE1; // FIXME: 라인 입력 받아야 함
+	removeWeather(user, cardID, targetID, lo, data);
+
+	std::vector<ID> bronzeIDs = std::vector<ID>();
+	std::vector<ID> unitIDs = user->enemy->getUnitIDs(LO::GRAVE);
+	for (auto id : unitIDs) {
+		if (user->enemy->getCardFromID(id)->type == TYPE::BRONZE)
+			bronzeIDs.push_back(id);
+	}
+
+	if (bronzeIDs.size() <= 0) return;
+
+	int randIndex = util::getRandNumBetween(0, bronzeIDs.size() - 1);
+	targetID = bronzeIDs[randIndex];
+	moveToEnemyGrave(user->enemy, cardID, targetID, location, data);
 }
 
+/*
+@ user
+@ targetID
+@ location
+@ data
+*/
 void caranthir(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	// FIXME: targetID, location 받아야함
+	targetID = 1;
+	user->enemy->removeFrom(user->enemy->findLine(targetID), targetID);
+	user->enemy->insertInto(location, targetID);
+	spawn(user, cardID, targetID, location, data);
 }
 
+/*
+@ user
+@ targetID
+*/
 void frightener(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	// FIXME: targetID 받아야함
+	targetID = 1;
+	user->removeFrom(user->findLine(targetID), targetID);
+	user->insertInto(location, targetID);
+	drawCard(user, cardID, targetID, location, data);
 }
 
+/*
+FIXME: 증폭으로 했지 강화로 안했음. 강화 뭔지 모르겠음
+@ user
+@ cardID
+@ targetID
+*/
 void unseenElder(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	if (user->getCardFromID(cardID)->skillData <= 0) return;
+
+	for (int i = 0; i < 3; i++) {
+		int unitCount = 0;
+		for (int j = 0; j < 3; j++)
+			unitCount += user->line[j].size();
+		if (unitCount <= 1) return;	// no unit except the unseenElder
+
+		// FIXME: targetID 받아야함
+		targetID = i + 1;
+		consume(user, cardID, targetID, location, data);
+	}
+	user->getCardFromID(cardID)->skillData -= 1;
 }
 
+/*
+@ user
+@ data : summon target unit no
+*/
 void arachas(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	for (auto id : user->deck) {
+		if (user->getCardFromID(id)->no == data) {
+			user->removeFrom(LO::DECK, id);
+			user->insertInto(location, id);
+		}
+	}
 }
 
 void vranWarrior(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	if (data != 0) {
+		user->getCardFromID(cardID)->skillData -= 1;
+		return; // repeat per two turns
+	}
+
+	std::vector<ID> unitIDs = user->getUnitIDs(location);
+	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), cardID));
+
+	if (pos + 1 <= unitIDs.size()) // vranWarrior is at the end of the line (right side)
+		return;
+
+	targetID = unitIDs[pos + 1];
+	consume(user, cardID, targetID, location, data);
+
+	user->getCardFromID(cardID)->skillData = 1;
 }
 
+/*
+normal skill
+TODO: 혼자 피해 받을 때 armor 무시 해야함
+@ user
+@ data : damage
+*/
 void arachasBehemoth(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	// TODO: arachas hatchling 아직 json에 추가 안함
+	spawn(user, cardID, targetID, LO(util::getRandNumBetween(LO::LINE1, LO::LINE3)), 32);
+	damage(user, cardID, cardID, location, data);
 }
 
+/*
+@ user
+@ location
+@ data : boost power target id
+*/
 void wildHuntRider(User * user, ID cardID, ID targetID, LO location, int data)
 {
+	// TODO: location 받아야함
+	ID weatherID = user->enemy->getWeatherCardIDFromLine(location);
+
+	if (weatherID == ID() || weatherID != data) return;
+
+	user->getCardFromID(weatherID)->skillData += 1;
 }
 
 void harpyEgg(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	// TODO: 하피 해츨링 아직 json에 추가 안함
-	spawn(user, cardID, targetID, user->findLine(cardID), 31);
+	spawn(user, cardID, targetID, location, 31);
 }

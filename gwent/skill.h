@@ -17,7 +17,6 @@ enum SKILL {
 	GETARMOR,			// 방어력 획득
 	SUMMON,				// 소환
 	ATTACK,				// 공격, 상대에게 피해를 입힘
-	BOOSTPOWER,			// 공격력 증폭
 	BOOST,				// 증폭
 	REMOVEWEATHER,		// 날씨 제거
 	MOVETOENEMYGRAVE,	// 상대방 무덤으로 이동
@@ -66,7 +65,6 @@ void damage(User* user, ID cardID, ID targetID, LO location, int data);
 void getArmor(User* user, ID cardID, ID targetID, LO location, int data);
 void summon(User* user, ID cardID, ID targetID, LO location, int data);
 void attack(User* user, ID cardID, ID targetID, LO location, int data); // 날씨 카드는 공격하지 않도록 주의
-void boostPower(User* user, ID cardID, ID targetID, LO location, int data);
 void boost(User* user, ID cardID, ID targetID, LO location, int data);
 void removeWeather(User* user, ID cardID, ID targetID, LO location, int data);
 void moveToEnemyGrave(User* user, ID cardID, ID targetID, LO location, int data);
@@ -76,7 +74,6 @@ void resurrect(User* user, ID cardID, ID targetID, LO location, int data);
 void destroy(User* user, ID cardID, ID targetID, LO location, int data);
 void destroyHighest(User* user, ID cardID, ID targetID, LO location, int data);
 void rally(User* user, ID cardID, ID targetID, LO location, int data);
-void spawnWeather(User* user, ID cardID, ID targetID, LO location, int data);
 
 /* SPECIFIC event card */
 void firstLight(User* user, ID cardID, ID targetID, LO location, int data);

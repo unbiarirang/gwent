@@ -31,6 +31,7 @@ void User::drawCard(int count)
 
 	for (int j = 0; j < count; j++) {
 		cardNum = deck.size();
+		if (cardNum <= 0) return;
 		cardIndex = util::getRandNumBetween(0, cardNum - 1);
 		cardID = deck[cardIndex];
 		insertInto(LO::HAND, cardID);
@@ -51,8 +52,8 @@ void User::deployCard(LO lo, ID cardID)
 	if (!(lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3))
 		return;
 
-	// wrong location to deploy card
-	if (card->line != LINE::ANY && card->line != LINE::WEATHER && card->line != LINE::EVENT
+	// wrong location to deploy card TODO: 그럼 에러 주고 다시 고르게 해야함
+	if (card->line != LINE::WEATHER && card->line != LINE::ANY && card->line != LINE::EVENT
 		&& (card->line != lo - 2))
 		return;
 
@@ -64,8 +65,8 @@ void User::deployCard(LO lo, ID cardID)
 		insertInto(lo, cardID);
 	}
 
-	//TODO: targetID랑 location 입력 받아야함
-	useSkill(SKILLKIND::DEPLOY, cardID, 0, lo);
+	//TODO: targetID랑 location 입력 받아야함. 지금 location은 카드가 놓아진 위치랑 같은곳
+	useSkill(SKILLKIND::DEPLOY, cardID, ID(), lo);
 }
 
 void User::deployEventCard(ID cardID)
@@ -87,7 +88,7 @@ void User::destroyCard(ID cardID)
 		return;
 
 	// weather card
-	if (getCardFromID(cardID) == nullptr) {
+	if (getCardFromID(cardID) == nullptr || getCardFromID(cardID)->line == LINE::WEATHER) {
 		removeFrom(lo, cardID);
 		insertInto(LO::GRAVE_ENEMY, cardID);
 		return;
@@ -175,15 +176,17 @@ void User::removeFrom(LO lo, ID cardID)
 		v = &enemy->grave;
 	}
 
+	// not exist
+	if (!isAt(lo, cardID)) return;
+
 	// calculate score if the card was on lines
 	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
-		if (getCardFromID(cardID) == nullptr) {}	// enemy's weather card
+		if (getCardFromID(cardID) == nullptr) {}	// weather card
 		else { changeRoundScoreForLine(lo, -getCardFromID(cardID)->strength); }	// calculate score if the card is going to be deployed
 	}
 
 	// remove the element from vector
-	if (isAt(lo, cardID))
-		(*v).erase(std::remove((*v).begin(), (*v).end(), cardID), (*v).end());
+	(*v).erase(std::remove((*v).begin(), (*v).end(), cardID), (*v).end());
 }
 
 void User::insertInto(LO lo, ID cardID)
@@ -206,14 +209,16 @@ void User::insertInto(LO lo, ID cardID)
 		v = &enemy->grave;
 	}
 
+	// already exist
+	if (isAt(lo, cardID)) return;
+
 	if (lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3) {
 		if (getCardFromID(cardID) == nullptr) {}	// weather card
 		else { changeRoundScoreForLine(lo, getCardFromID(cardID)->strength); }	// calculate score if the card is going to be deployed
 	}
 
 	// insert the element into vector
-	if (!isAt(lo, cardID))
-		(*v).push_back(cardID);
+	(*v).push_back(cardID);
 }
 
 LO User::findLine(ID cardID)
@@ -288,6 +293,9 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 	skill f = nullptr;
 	int data = 0;
 
+	if (card == nullptr)
+		card = enemy->getCardFromID(cardID);
+
 	switch (kind) {
 	case SKILLKIND::NORMAL: {
 		f = skillMap.getSkill(SKILL(card->skill)); 
@@ -308,7 +316,7 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 
 	if (f == nullptr) return;			//no skill
 
-	if (card->line == LINE::WEATHER)	//apply weather card on the enemy's filed
+	if (card == nullptr || card->line == LINE::WEATHER)
 		f(this->enemy, cardID, targetID, location, data);
 	else
 		f(this, cardID, targetID, location, data);
@@ -322,6 +330,8 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 void User::changeStrength(ID cardID, int v)
 {
 	Card* card = getCardFromID(cardID);
+
+	if (card == nullptr) return;
 
 	int prev_str = card->getStrength();
 	int is_dead = card->changeStrength(v);
@@ -495,7 +505,7 @@ Card * User::getCardFromID(ID cardID)
 ID User::getWeatherCardIDFromLine(LO lo)
 {
 	for (auto id : line[lo - 3]) {
-		if (getCardFromID(id) == nullptr) { // 상대방 카드라 내 카드 정보에 없음
+		if (getCardFromID(id) == nullptr || getCardFromID(id)->line == LINE::WEATHER) { // 상대방 카드라 내 카드 정보에 없음
 			return id;
 		}
 	}
@@ -507,7 +517,8 @@ std::vector<ID> User::getUnitIDs(LO lo)
 	std::vector<ID> unitIDs = std::vector<ID>();
 
 	for (auto id : line[lo - 3]) {
-		if (getCardFromID(id) != nullptr && getCardFromID(id)->line != LINE::EVENT)	//filter weather and event cards
+		if (getCardFromID(id) != nullptr && getCardFromID(id)->line != LINE::WEATHER
+			&& getCardFromID(id)->line != LINE::EVENT)	//filter weather and event cards
 			unitIDs.push_back(id);
 	}
 

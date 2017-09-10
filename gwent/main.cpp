@@ -80,10 +80,10 @@ int main() {
 
 	game->setCardsToDeck();
 	user1->drawCard(30);
-	user2->drawCard(15);
+	user2->drawCard(30);
 
-	user2->deployCard(LO::LINE1, 32);
-	user1->deployCard(LO::LINE1, 5);
+	user1->deployCard(LO::LINE1, 22);
+	user1->deployCard(LO::LINE1, 17);
 	cout << "user1 score: " << user1->getRoundScore() << endl;
 	cout << "user2 score: " << user2->getRoundScore() << endl;
 
