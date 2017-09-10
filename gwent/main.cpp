@@ -82,51 +82,47 @@ int main() {
 	user1->drawCard(30);
 	user2->drawCard(30);
 
+	user1->deployCard(LO::LINE1, 1);
 	user2->deployCard(LO::LINE1, 31);
-	cout << "score: " << user2->getRoundScore() << endl;
-	user1->deployCard(LO::LINE1, 22);
-	user1->deployCard(LO::LINE2, 23);
-	cout << "score: " << user2->getRoundScore() << endl;
+	user2->deployCard(LO::LINE1, 32);
+	skillMap.getSkill(SKILL::COMMANDERSHORN)(user2, 60, 31, LO::LINE1, 3);
+	cout << "user1 score: " << user1->getRoundScore() << endl;
+	cout << "user2 score: " << user2->getRoundScore() << endl;
 
-	for (auto x : user1->hand) {
-		cout << "hand: " << x << endl;
-	}
-	for (auto x : user1->deck) {
-		cout << "deck: " << x << endl;
-	}
 	for (auto x : user1->line[0]) {
-		cout << "line1: " << x << endl;
+		cout << "user1 line1: " << x << endl;
 	}
-	for (auto x : user1->line[1]) {
-		cout << "line2: " << x << endl;
+	for (auto x : user2->line[0]) {
+		cout << "user2 line1: " << x << endl;
 	}
 	for (auto x : user1->grave) {
-		cout << "grave: " << x << endl;
+		cout << "user1 grave: " << x << endl;
+	}
+	for (auto x : user2->grave) {
+		cout << "user2 grave: " << x << endl;
 	}
 	cout << "=====================" << endl;
 
-	//cout << "score: " << user1->getRoundScore() << endl;
+	//skill s = skillMap.getSkill(SKILL::ATTACK);
+	//s(user1, 1, 31, LO::LINE1, 2);
+	//cout << "score: " << user2->getRoundScore() << endl;
 
-	skill s = skillMap.getSkill(SKILL::ATTACK);
-	s(user1, 1, 31, LO::LINE1, 2);
-	cout << "score: " << user2->getRoundScore() << endl;
+	user1->deployCard(LO::LINE1, 27);
 
-	user1->deployCard(LO::LINE1, 21);
+	cout << "user1 score: " << user1->getRoundScore() << endl;
+	cout << "user2 score: " << user2->getRoundScore() << endl;
 
-	for (auto x : user1->hand) {
-		cout << "hand: " << x << endl;
-	}
-	for (auto x : user1->deck) {
-		cout << "deck: " << x << endl;
-	}
 	for (auto x : user1->line[0]) {
-		cout << "line1: " << x << endl;
+		cout << "user1 line1: " << x << endl;
 	}
-	for (auto x : user1->line[1]) {
-		cout << "line2: " << x << endl;
+	for (auto x : user2->line[0]) {
+		cout << "user2 line1: " << x << endl;
 	}
 	for (auto x : user1->grave) {
-		cout << "grave: " << x << endl;
+		cout << "user1 grave: " << x << endl;
+	}
+	for (auto x : user2->grave) {
+		cout << "user2 grave: " << x << endl;
 	}
 
 	system("pause");

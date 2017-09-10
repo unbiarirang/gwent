@@ -74,11 +74,14 @@ public:
 	void useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location);
 	void changeStrength(ID cardID, int v);
 
-	ID getHighest();					// select the highest randomly if there are more than one higest FIXME: 벡터에 넣고 하나 뽑아야함
-	ID getLowest();						// select the lowest randomly if there are more than one lowest
+	ID getHighest();					// among all units in the field
+	ID getLowest();						// among all units in the field
+	ID getHighestFromLine(LO lo);		// select the highest randomly if there are more than one higest
+	ID getLowestFromLine(LO lo);		// select the lowest randomly if there are more than one lowest
 
 	Card* getCardFromID(ID cardID);
 	ID getWeatherCardIDFromLine(LO lo);
+	std::vector<ID> getUnitIDs(LO lo);
 };
 
 #endif

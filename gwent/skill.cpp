@@ -31,6 +31,25 @@ void SkillMap::init()
 	skillMap.setSkill(SKILL::GERALTIGNI, geraltIgni);
 	skillMap.setSkill(SKILL::ROACH, roach);
 	skillMap.setSkill(SKILL::THUNDERBOLTPOSITION, thunderboltPosition);
+
+	skillMap.setSkill(SKILL::DAGON, dagon);
+	skillMap.setSkill(SKILL::FOGLET, foglet);
+	skillMap.setSkill(SKILL::GEELS, geels);
+	skillMap.setSkill(SKILL::CELAENOHARPY, celaenoHarpy);
+	skillMap.setSkill(SKILL::WOODLANDSPIRIT, woodlandSpirit);
+	skillMap.setSkill(SKILL::EARTHELEMENTAL, earthElemental);
+	skillMap.setSkill(SKILL::CRONEWEAVESS, croneWeavess);
+	skillMap.setSkill(SKILL::CRONEWHISPESS, croneWhispess);
+	skillMap.setSkill(SKILL::CRONEBREWESS, croneBrewess);
+	skillMap.setSkill(SKILL::ARCHGRIFFIN, archgriffin);
+	skillMap.setSkill(SKILL::CARANTHIR, caranthir);
+	skillMap.setSkill(SKILL::FRIGHTENER, frightener);
+	skillMap.setSkill(SKILL::UNSEENELDER, unseenElder);
+	skillMap.setSkill(SKILL::ARACHAS, arachas);
+	skillMap.setSkill(SKILL::VRANWARRIOR, vranWarrior);
+	skillMap.setSkill(SKILL::ARACHASBEHEMOTH, arachasBehemoth);
+	skillMap.setSkill(SKILL::WILDHUNTRIDER, wildHuntRider);
+	skillMap.setSkill(SKILL::HARPYEGG, harpyEgg);
 }
 
 skill SkillMap::getSkill(SKILL skillName)
@@ -75,10 +94,14 @@ void damage(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 	user->changeStrength(cardID, -data);
 }
 
+/*
+@ user
+@ targetID
+@ data
+*/
 void getArmor(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	Card* card = user->getCardFromID(cardID);
-
+	Card* card = user->getCardFromID(targetID);
 	card->changeArmor(data);
 }
 
@@ -111,9 +134,11 @@ void summon(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data
 	user->insertInto(line, summonID);
 }
 
+// data: damage count
 void attack(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	user->enemy->changeStrength(targetID, -data);
+	if (user->enemy->getCardFromID(targetID)->line != LINE::WEATHER)
+		user->enemy->changeStrength(targetID, -data);
 }
 
 void boostPower(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
@@ -121,6 +146,10 @@ void boostPower(User* user, ID cardID, ID targetID = 0, LO location = LO(), int 
 
 }
 
+/*
+@ user
+@ targetID
+*/
 void boost(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
 	user->changeStrength(targetID, data);
@@ -129,7 +158,7 @@ void boost(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data 
 // data: LO enum (LO::LINE1, LO::LINE2, LO::LINE3)
 void removeWeather(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
-	LO line = LO(data);
+	LO line = location;
 	ID weatherCardID = user->getWeatherCardIDFromLine(line);
 
 	user->destroyCard(weatherCardID);
@@ -160,9 +189,13 @@ void resurrect(User* user, ID cardID, ID targetID = 0, LO location = LO(), int d
 	user->insertInto(user->findLine(cardID), targetID);
 }
 
-// destroy the enemy's unit
+/*
+destroy the user's unit
+@ user
+@ targetID
+*/
 void destroy(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0) {
-	user->enemy->destroyCard(targetID);
+	user->destroyCard(targetID);
 }
 
 void destroyHighest(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0) // 걍 구체적인걸로 만들자 어차피 아그니밖에 안쓰는듯
@@ -226,63 +259,263 @@ void firstLight(User * user, ID cardID, ID targetID, LO location = LO(), int dat
 	rally(user, cardID, targetID, location, 0);
 }
 
-// data: LO enum (LO::LINE1, LO::LINE2, LO::LINE3)
+// data: attack power
 void bitingFrost(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
-	LO lo = location;
+	ID lowestID = user->enemy->getLowestFromLine(location);
 
-	std::vector<ID> lowestCardIDs;
-	int min = 1000;
-	Card* card;
-
-	for (auto id : user->enemy->line[lo - 3]) {
-		card = user->enemy->getCardFromID(id);
-		if (card->getStrength() < min && card->line != LINE::WEATHER)
-			min = card->getStrength();
-	}
-	for (auto id : user->enemy->line[lo - 3]) {
-		card = user->enemy->getCardFromID(id);
-		if (card->getStrength() == min)
-			lowestCardIDs.push_back(id);
-	}
-
-	// no unit card in the line
-	if (lowestCardIDs.size() == 0) return;
-
-	int randomIndex = util::getRandNumBetween(0, lowestCardIDs.size() - 1);
-	ID lowestID = lowestCardIDs[randomIndex];
-
-	attack(user, cardID, lowestID, location, user->getCardFromID(cardID)->power);
+	attack(user, cardID, lowestID, location, data);
 }
 
+// data: attack power
 void impenetrableFog(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	ID highestID = user->enemy->getHighestFromLine(location);
+
+	attack(user, cardID, highestID, location, data);
 }
 
+// data: attack power
 void torrentialRain(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	User* enemy = user->enemy;
+	std::vector<ID> unitIDs = enemy->getUnitIDs(location);
+
+	for (auto id : enemy->line[location - 3]) {
+		if (enemy->getCardFromID(id)->line != LINE::WEATHER)	//filter weather cards
+			unitIDs.push_back(id);
+	}
+
+	if (unitIDs.size() <= 0) return; //first attack
+
+	// select one of unit cards randomly
+	int randomIndex = util::getRandNumBetween(0, unitIDs.size() - 1);
+	ID id = enemy->line[location - 3][randomIndex];
+	attack(user, cardID, id, location, data);
+
+	unitIDs.erase(std::remove(unitIDs.begin(), unitIDs.end(), id), unitIDs.end());
+
+	if (unitIDs.size() <= 0) return; // second attack
+
+	randomIndex = util::getRandNumBetween(0, unitIDs.size() - 1);
+	id = enemy->line[location - 3][randomIndex];
+	attack(user, cardID, id, location, data);
 }
 
+// data: attack power
 void lacerate(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	std::vector<ID> unitIDs = user->enemy->getUnitIDs(location);
+
+	for (auto id : unitIDs) {
+			attack(user, cardID, id, location, data);
+	}
 }
 
+/*
+미안하지만 가운데 기준으로 5명
+@ user
+@ targetID
+@ location
+@ data
+*/
 void commandersHorn(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	std::vector<ID> unitIDs = user->getUnitIDs(location);
+	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), targetID));
+
+	if (pos >= unitIDs.size()) //target card not found
+		return;
+
+	boost(user, cardID, unitIDs[pos], location, data);
+
+	for (auto p = pos + 1; p <= pos + 2; p++) {
+		if (p >= unitIDs.size()) //no card one the right side of the target card
+			break;
+
+		boost(user, cardID, unitIDs[p], location, data);
+	}
+
+	for (auto p = pos - 1; p >= pos - 2; p--) {
+		if (p < 0) //no card one the left side of the target card
+			return;
+
+		boost(user, cardID, unitIDs[p], location, data);
+	}
 }
 
 void bekkersTwistedMirror(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	ID highestID = user->getHighest();
+	ID lowestID = user->getLowest();
+
+	int changeValue = 0;
+
+	// the higest unit is the user's
+	if (user->getCardFromID(highestID) != nullptr) {
+		changeValue = user->getCardFromID(highestID)->getStrength();
+		if (changeValue > 10) changeValue = 10;
+		damage(user, highestID, targetID, location, changeValue);
+	} else {
+		changeValue = user->enemy->getCardFromID(highestID)->getStrength();
+		if (changeValue > 10) changeValue = 10;
+		attack(user, cardID, highestID, location, changeValue);
+	}
+
+	// the lowest unit is the user's
+	if (user->getCardFromID(lowestID) != nullptr)
+		boost(user, cardID, lowestID, location, changeValue);
+	else
+		boost(user->enemy, cardID, lowestID, location, changeValue);
 }
 
 void geraltIgni(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
+	LO lo = user->findLine(cardID);
+	int totalStr = 0;
+
+	for (auto id : user->enemy->line[lo - 3]) {
+		totalStr += user->enemy->getCardFromID(id)->getStrength();
+	}
+
+	if (totalStr < 25) return;
+
+	// select all highest cards from enemy's line
+	std::vector<ID> highestCardIDs;
+	int max = 0;
+	Card* card;
+	std::vector<ID> line = user->enemy->line[lo - 3];
+
+	for (auto id : line) {
+		card = user->enemy->getCardFromID(id);
+		//filter weather and event cards
+		if (card->getStrength() > max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			max = card->getStrength();
+	}
+	for (auto id : line) {
+		card = user->enemy->getCardFromID(id);
+		if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			highestCardIDs.push_back(id);
+	}
+
+	// no unit card in the line
+	if (highestCardIDs.size() <= 0) return;
+
+	for (auto id : highestCardIDs)
+		destroy(user->enemy, cardID, id, location, 0);
 }
 
+/*
+TODO: 얘는 deploy skill도 아니고 그냥 skill도 아니고 특별 처리가 필요함 ㅡㅡ
+@ user
+@ cardID
+*/
 void roach(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
+{
+	int randLineNum = util::getRandNumBetween(LO::LINE1, LO::LINE3);
+	user->deployCard(LO(randLineNum), cardID);
+}
+
+/*
+미안하지만 가운데 기준으로 3명
+@ user
+@ targetID
+@ location
+@ data
+*/
+void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
+{
+	std::vector<ID> unitIDs = user->getUnitIDs(location);
+	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), targetID));
+
+	if (pos >= unitIDs.size()) //target card not found
+		return;
+
+	getArmor(user, cardID, unitIDs[pos], location, user->getCardFromID(cardID)->skillData);
+	boost(user, cardID, unitIDs[pos], location, data);
+
+	auto p = pos + 1;
+	if (p < unitIDs.size()) { //there is a card one the right side of the target card
+		getArmor(user, cardID, unitIDs[p], location, user->getCardFromID(cardID)->skillData);
+		boost(user, cardID, unitIDs[p], location, data);
+	}
+
+	p = pos - 1;
+	if (p < 0) //no card one the left side of the target card
+		return;
+
+	getArmor(user, cardID, unitIDs[p], location, user->getCardFromID(cardID)->skillData);
+	boost(user, cardID, unitIDs[p], location, data);
+}
+
+void dagon(User * user, ID cardID, ID targetID, LO location, int data)
 {
 }
 
-void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
+void foglet(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void geels(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void celaenoHarpy(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void woodlandSpirit(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void earthElemental(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void croneWeavess(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void croneWhispess(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void croneBrewess(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void archgriffin(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void caranthir(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void frightener(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void unseenElder(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void arachas(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void vranWarrior(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void arachasBehemoth(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void wildHuntRider(User * user, ID cardID, ID targetID, LO location, int data)
+{
+}
+
+void harpyEgg(User * user, ID cardID, ID targetID, LO location, int data)
 {
 }

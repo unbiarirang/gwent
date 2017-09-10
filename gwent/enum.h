@@ -2,7 +2,7 @@
 #define ENUM_H
 
 enum LO { // location of a card. 실제 카드 위치. TODO: lineWeather은 없음
-	DECK, HAND, GRAVE, LINE1, LINE2, LINE3, GRAVE_ENEMY
+	HAND = 1, GRAVE, LINE1, LINE2, LINE3, DECK, GRAVE_ENEMY
 };
 
 enum TYPE { // card type (tear)

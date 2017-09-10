@@ -298,8 +298,8 @@ void User::changeStrength(ID cardID, int v)
 	int is_dead = card->changeStrength(v);
 
 	if (is_dead) {
-		destroyCard(cardID);
 		changeRoundScoreForLine(findLine(cardID), -prev_str);
+		destroyCard(cardID);
 		return;
 	}
 
@@ -308,47 +308,152 @@ void User::changeStrength(ID cardID, int v)
 
 ID User::getHighest()
 {
-	ID highestCardID;
+	std::vector<ID> highestCardIDs;
+	std::vector<ID> _line;
 	int max = 0;
-	for (int i = 0; i <= 3; i++) {
-		for (auto id : line[i]) {
-			Card* card = getCardFromID(id);
-			if (card->getStrength() > max) {
+	Card* card;
+
+	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
+		_line = line[lo - 3];
+		for (auto id : _line) {
+			card = getCardFromID(id);
+			//filter weather and event cards
+			if (card->getStrength() > max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 				max = card->getStrength();
-				highestCardID = id;
-			} else if (card->getStrength() < max) {}
-			else {
-				if (util::getRandNumBetween(0, 1)) {	// randomly select one
-					max = card->getStrength();
-					highestCardID = id;
-				}
-			}
+		}
+
+		_line = enemy->line[lo - 3];
+		for (auto id : _line) {
+			card = enemy->getCardFromID(id);
+			//filter weather and event cards
+			if (card->getStrength() > max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				max = card->getStrength();
 		}
 	}
-	return highestCardID;
+
+	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
+		_line = line[lo - 3];
+		for (auto id : _line) {
+			card = getCardFromID(id);
+			if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				highestCardIDs.push_back(id);
+		}
+
+		_line = enemy->line[lo - 3];
+		for (auto id : _line) {
+			card = enemy->getCardFromID(id);
+			if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				highestCardIDs.push_back(id);
+		}
+	}
+
+	// no target card
+	if (highestCardIDs.size() <= 0) return ID();
+
+	// select one of highest cards randomly
+	int randomIndex = util::getRandNumBetween(0, highestCardIDs.size() - 1);
+	return highestCardIDs[randomIndex];
 }
 
 ID User::getLowest()
 {
-	ID lowestCardID;
+	std::vector<ID> lowestCardIDs;
+	std::vector<ID> _line;
 	int min = 1000;
-	for (int i = 0; i <= 3; i++) {
-		for (auto id : line[i]) {
-			Card* card = getCardFromID(id);
-			if (card->getStrength() < min) {
+	Card* card;
+
+	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
+		_line = line[lo - 3];
+		for (auto id : _line) {
+			card = getCardFromID(id);
+			//filter weather and event cards
+			if (card->getStrength() < min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
 				min = card->getStrength();
-				lowestCardID = id;
-			}
-			else if (card->getStrength() > min) {}
-			else {
-				if (util::getRandNumBetween(0, 1)) {	// randomly select one
-					min = card->getStrength();
-					lowestCardID = id;
-				}
-			}
+		}
+
+		_line = enemy->line[lo - 3];
+		for (auto id : _line) {
+			card = enemy->getCardFromID(id);
+			//filter weather and event cards
+			if (card->getStrength() < min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				min = card->getStrength();
 		}
 	}
-	return lowestCardID;
+
+	for (int lo = LO::LINE1; lo < LO::LINE3; lo++) {
+		_line = line[lo - 3];
+		for (auto id : _line) {
+			card = getCardFromID(id);
+			if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				lowestCardIDs.push_back(id);
+		}
+
+		_line = enemy->line[lo - 3];
+		for (auto id : _line) {
+			card = enemy->getCardFromID(id);
+			if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+				lowestCardIDs.push_back(id);
+		}
+	}
+
+	// no target card
+	if (lowestCardIDs.size() <= 0) return ID();
+
+	// select one of highest cards randomly
+	int randomIndex = util::getRandNumBetween(0, lowestCardIDs.size() - 1);
+	return lowestCardIDs[randomIndex];
+}
+
+ID User::getHighestFromLine(LO lo)
+{
+	std::vector<ID> highestCardIDs;
+	int max = 0;
+	Card* card;
+
+	for (auto id : line[lo - 3]) {
+		card = getCardFromID(id);
+		//filter weather and event cards
+		if (card->getStrength() > max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			max = card->getStrength();
+	}
+	for (auto id : line[lo - 3]) {
+		card =getCardFromID(id);
+		if (card->getStrength() == max && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			highestCardIDs.push_back(id);
+	}
+
+	// no unit card in the line
+	if (highestCardIDs.size() <= 0) return ID();
+
+	// select one of lowest cards randomly
+	int randomIndex = util::getRandNumBetween(0, highestCardIDs.size() - 1);
+	return highestCardIDs[randomIndex];
+}
+
+ID User::getLowestFromLine(LO lo)
+{
+	std::vector<ID> lowestCardIDs;
+	int min = 1000;
+	Card* card;
+
+	for (auto id : line[lo - 3]) {
+		card = getCardFromID(id);
+		//filter weather and event cards
+		if (card->getStrength() < min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			min = card->getStrength();
+	}
+	for (auto id : line[lo - 3]) {
+		card = getCardFromID(id);
+		if (card->getStrength() == min && card->line != LINE::WEATHER && card->line != LINE::EVENT)
+			lowestCardIDs.push_back(id);
+	}
+
+	// no unit card in the line
+	if (lowestCardIDs.size() <= 0) return ID();
+
+	// select one of lowest cards randomly
+	int randomIndex = util::getRandNumBetween(0, lowestCardIDs.size() - 1);
+	return lowestCardIDs[randomIndex];
 }
 
 Card * User::getCardFromID(ID cardID)
@@ -364,4 +469,16 @@ ID User::getWeatherCardIDFromLine(LO lo)
 		}
 	}
 	return 0;
+}
+
+std::vector<ID> User::getUnitIDs(LO lo)
+{
+	std::vector<ID> unitIDs = std::vector<ID>();
+
+	for (auto id : line[lo - 3]) {
+		if (getCardFromID(id)->line != LINE::WEATHER && getCardFromID(id)->line != LINE::EVENT)	//filter weather cards
+			unitIDs.push_back(id);
+	}
+
+	return unitIDs;
 }

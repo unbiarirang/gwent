@@ -36,7 +36,26 @@ enum SKILL {
 	BEKKERSTWISTEDMIRROR,
 	GERALTIGNI,
 	ROACH,
-	THUNDERBOLTPOSITION
+	THUNDERBOLTPOSITION,
+
+	DAGON,
+	FOGLET,
+	GEELS,
+	CELAENOHARPY,
+	WOODLANDSPIRIT,
+	EARTHELEMENTAL,
+	CRONEWEAVESS,
+	CRONEWHISPESS,
+	CRONEBREWESS,
+	ARCHGRIFFIN,
+	CARANTHIR,
+	FRIGHTENER,
+	UNSEENELDER,
+	ARACHAS,
+	VRANWARRIOR,
+	ARACHASBEHEMOTH,
+	WILDHUNTRIDER,
+	HARPYEGG
 };
 
 /* BASIC */
@@ -45,7 +64,7 @@ void spawn(User* user, ID cardID, ID targetID, LO location, int data);
 void damage(User* user, ID cardID, ID targetID, LO location, int data);
 void getArmor(User* user, ID cardID, ID targetID, LO location, int data);
 void summon(User* user, ID cardID, ID targetID, LO location, int data);
-void attack(User* user, ID cardID, ID targetID, LO location, int data);
+void attack(User* user, ID cardID, ID targetID, LO location, int data); // 날씨 카드는 공격하지 않도록 주의
 void boostPower(User* user, ID cardID, ID targetID, LO location, int data);
 void boost(User* user, ID cardID, ID targetID, LO location, int data);
 void removeWeather(User* user, ID cardID, ID targetID, LO location, int data);
@@ -68,6 +87,26 @@ void bekkersTwistedMirror(User* user, ID cardID, ID targetID, LO location, int d
 void geraltIgni(User* user, ID cardID, ID targetID, LO location, int data);
 void roach(User* user, ID cardID, ID targetID, LO location, int data);
 void thunderboltPosition(User* user, ID cardID, ID targetID, LO location, int data);
+
+/* SPECIFIC unit card */
+void dagon(User* user, ID cardID, ID targetID, LO location, int data);
+void foglet(User* user, ID cardID, ID targetID, LO location, int data);
+void geels(User* user, ID cardID, ID targetID, LO location, int data);
+void celaenoHarpy(User* user, ID cardID, ID targetID, LO location, int data);
+void woodlandSpirit(User* user, ID cardID, ID targetID, LO location, int data);
+void earthElemental(User* user, ID cardID, ID targetID, LO location, int data);
+void croneWeavess(User* user, ID cardID, ID targetID, LO location, int data);
+void croneWhispess(User* user, ID cardID, ID targetID, LO location, int data);
+void croneBrewess(User* user, ID cardID, ID targetID, LO location, int data);
+void archgriffin(User* user, ID cardID, ID targetID, LO location, int data);
+void caranthir(User* user, ID cardID, ID targetID, LO location, int data);
+void frightener(User* user, ID cardID, ID targetID, LO location, int data);
+void unseenElder(User* user, ID cardID, ID targetID, LO location, int data);
+void arachas(User* user, ID cardID, ID targetID, LO location, int data);
+void vranWarrior(User* user, ID cardID, ID targetID, LO location, int data);
+void arachasBehemoth(User* user, ID cardID, ID targetID, LO location, int data);
+void wildHuntRider(User* user, ID cardID, ID targetID, LO location, int data);
+void harpyEgg(User* user, ID cardID, ID targetID, LO location, int data);
 
 class SkillMap {
 private:
