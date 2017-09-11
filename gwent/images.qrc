@@ -7,5 +7,35 @@
         <file>images/yennefer.jpg</file>
         <file>images/dial_background.jpg</file>
         <file>images/board.jpg</file>
+        <file>images/card/arachas.png</file>
+        <file>images/card/arachasBehemoth.png</file>
+        <file>images/card/archgriffin.png</file>
+        <file>images/card/bekkersTwistedMirror.png</file>
+        <file>images/card/bitingFrost.png</file>
+        <file>images/card/caranthir.png</file>
+        <file>images/card/celaenoHarpy.png</file>
+        <file>images/card/commandersHorn.png</file>
+        <file>images/card/croneBrewess.png</file>
+        <file>images/card/croneWhispess.png</file>
+        <file>images/card/dagon.png</file>
+        <file>images/card/earthElemental.png</file>
+        <file>images/card/firstLight.png</file>
+        <file>images/card/foglet.png</file>
+        <file>images/card/frightener.png</file>
+        <file>images/card/geels.png</file>
+        <file>images/card/geraltIgni.png</file>
+        <file>images/card/impenetrableFog.png</file>
+        <file>images/card/lacerate.png</file>
+        <file>images/card/lesserEarthElemental.png</file>
+        <file>images/card/roach.png</file>
+        <file>images/card/torrentialRain.png</file>
+        <file>images/card/unseenElder.png</file>
+        <file>images/card/vranWarrior.png</file>
+        <file>images/card/wildHuntRider.png</file>
+        <file>images/card/woodlandSpirit.png</file>
+        <file>images/card/harpyEgg.png</file>
+        <file>images/card/rabidWolf.png</file>
+        <file>images/card/croneWeavess.png</file>
+        <file>images/card/thunderboltPotion.png</file>
     </qresource>
 </RCC>

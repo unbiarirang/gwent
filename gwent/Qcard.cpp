@@ -1,5 +1,10 @@
-#include "card.h"
+#include "Qcard.h"
 #include <QLabel>
+#include <vector>
+#include <QPixmap>
+#include <QPushButton>
+#include "global.h"
+#include "clabel.h"
 
 Card::Card(QWidget *parent):
     QLabel(parent),
@@ -19,4 +24,9 @@ void Card::mouseMoveEvent(QMouseEvent *event)
 {
     move(event->globalX()-x_coordinate-parentWidget->geometry().x(),
          event->globalY()-y_coordinate-parentWidget->geometry().y());
+}
+
+void Qcard::init()
+{
+
 }

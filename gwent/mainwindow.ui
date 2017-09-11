@@ -26,12 +26,16 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">#page {
+   <string notr="true">#page_login {
 border-image: url(:/images/images/wallpaper.jpg) 0 0 0 0 strectch stretch;
 }
 
-#page2 {
+#page_menu {
 border-image: url(:/images/images/ciri.jpg) 0 0 0 0 strectch stretch;
+}
+
+#page_setDeck {
+border-image: url(:/images/images/nithral.jpg) 0 0 0 0 strectch stretch;
 }
 
 #frame_mainMenu {
@@ -40,6 +44,10 @@ background-color:rgba(48, 132, 119, 100);
 
 #frame_board1, #frame_board2 {
 border-image: url(:/images/images/board.jpg) 0 0 0 0 strectch stretch;
+}
+
+#frame_setDeck {
+background-color: rgba(48, 55, 133, 100)
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -73,10 +81,27 @@ border-image: url(:/images/images/board.jpg) 0 0 0 0 strectch stretch;
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="currentIndex">
-       <number>2</number>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+color: white;
+background-color: black;
+border-width: 1px;
+border-style: soild;
+border-radius: 7;
+font: 10pt &quot;Cambria&quot;;
+padding: 3px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+QPushButton:hover {
+color: rgb(200, 200, 200)
+}</string>
       </property>
-      <widget class="QWidget" name="page">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="page_login">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -147,7 +172,7 @@ color: white;
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page2">
+      <widget class="QWidget" name="page_menu">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -196,7 +221,7 @@ color: white;
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>1500</width>
             <height>20</height>
            </size>
           </property>
@@ -278,28 +303,28 @@ color: rgb(220, 220, 220);
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="button_deck">
+              <widget class="QPushButton" name="button_menu_deck">
                <property name="text">
                 <string>Deck</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="button_1p">
+              <widget class="QPushButton" name="button_menu_1p">
                <property name="text">
                 <string>1P PLAY</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="button_2p">
+              <widget class="QPushButton" name="button_menu_2p">
                <property name="text">
                 <string>2P PLAY</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="button_settings">
+              <widget class="QPushButton" name="button_menu_settings">
                <property name="text">
                 <string>Settings</string>
                </property>
@@ -328,7 +353,147 @@ color: rgb(220, 220, 220);
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page3">
+      <widget class="QWidget" name="page_setDeck">
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="hlayout_setDeck">
+          <property name="leftMargin">
+           <number>30</number>
+          </property>
+          <property name="topMargin">
+           <number>30</number>
+          </property>
+          <property name="rightMargin">
+           <number>30</number>
+          </property>
+          <property name="bottomMargin">
+           <number>30</number>
+          </property>
+          <item>
+           <widget class="QFrame" name="frame_setDeck">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QFrame" name="frame_setDeck2">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 10pt &quot;Cambria&quot;;
+color: white;</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <layout class="QVBoxLayout" name="vlayout_setDeck">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <spacer name="verticalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <property name="spacing">
+                     <number>3</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="button_setDeck_save">
+                      <property name="cursor">
+                       <cursorShape>PointingHandCursor</cursorShape>
+                      </property>
+                      <property name="text">
+                       <string>SAVE</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="button_setDeck_back">
+                      <property name="cursor">
+                       <cursorShape>PointingHandCursor</cursorShape>
+                      </property>
+                      <property name="text">
+                       <string>Back</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <layout class="QGridLayout" name="glayout_setDeck"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page4">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <property name="leftMargin">
          <number>0</number>

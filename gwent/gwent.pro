@@ -27,12 +27,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     logindialog.cpp \
-    card.cpp
+    pagesetdeck.cpp \
+    Qcard.cpp \
+    clabel.cpp \
+    global.cpp
 
 HEADERS += \
         mainwindow.h \
     logindialog.h \
-    card.h
+    pagesetdeck.h \
+    Qcard.h \
+    global.h \
+    clabel.h
 
 FORMS += \
         mainwindow.ui \

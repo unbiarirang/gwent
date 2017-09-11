@@ -20,14 +20,23 @@ public:
 
 private slots:
     void showLoginDialog();
-    void changeStackedWidget(QString);
+    void changeStackedWidget(QWidget* page);
+    void goToMenu(QString);
 
     void on_button_login_clicked();
+    void cardSelected(int);
+
+    void on_button_setDeck_back_clicked();
+
+    void on_button_setDeck_save_clicked();
+
+    void on_button_menu_deck_clicked();
 
 private:
     Ui::MainWindow *ui;
     loginDialog *loginDial;
-    QStackedWidget *stackedWidget;
+
+    int x;
 };
 
 #endif // MAINWINDOW_H

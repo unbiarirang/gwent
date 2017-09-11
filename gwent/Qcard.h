@@ -1,9 +1,13 @@
-#ifndef CARD_H
-#define CARD_H
+#ifndef QCARD_H
+#define QCARD_H
 
 #include <QMouseEvent>
 #include <QWidget>
 #include <QLabel>
+
+namespace Qcard {
+void init();
+}
 
 class Card : public QLabel
 {
@@ -20,4 +24,4 @@ private:
     int x_coordinate, y_coordinate;
 };
 
-#endif // CARD_H
+#endif // QCARD_H
