@@ -30,7 +30,7 @@ void SkillMap::init()
 	skillMap.setSkill(SKILL::BEKKERSTWISTEDMIRROR, bekkersTwistedMirror);
 	skillMap.setSkill(SKILL::GERALTIGNI, geraltIgni);
 	skillMap.setSkill(SKILL::ROACH, roach);
-	skillMap.setSkill(SKILL::THUNDERBOLTPOSITION, thunderboltPosition);
+	skillMap.setSkill(SKILL::THUNDERBOLTPOTION, thunderboltPotion);
 
 	skillMap.setSkill(SKILL::DAGON, dagon);
 	skillMap.setSkill(SKILL::FOGLET, foglet);
@@ -457,7 +457,7 @@ void roach(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 @ location
 @ data
 */
-void thunderboltPosition(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
+void thunderboltPotion(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
 	std::vector<ID> unitIDs = user->getUnitIDs(location);
 	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), targetID));

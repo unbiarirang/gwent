@@ -36,7 +36,7 @@ enum SKILL {
 	BEKKERSTWISTEDMIRROR,
 	GERALTIGNI,
 	ROACH,
-	THUNDERBOLTPOSITION,
+	THUNDERBOLTPOTION,
 
 	DAGON = 41,
 	FOGLET,
@@ -83,7 +83,7 @@ void commandersHorn(User* user, ID cardID, ID targetID, LO location, int data);
 void bekkersTwistedMirror(User* user, ID cardID, ID targetID, LO location, int data);
 void geraltIgni(User* user, ID cardID, ID targetID, LO location, int data);
 void roach(User* user, ID cardID, ID targetID, LO location, int data);
-void thunderboltPosition(User* user, ID cardID, ID targetID, LO location, int data);
+void thunderboltPotion(User* user, ID cardID, ID targetID, LO location, int data);
 
 /* SPECIFIC unit card */
 void dagon(User* user, ID cardID, ID targetID, LO location, int data);

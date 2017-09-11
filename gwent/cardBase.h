@@ -1,9 +1,16 @@
 #ifndef CARDBASE_H
 #define CARDBASE_H
 
+#include "json/json.h"
 #include <string>
+#include <vector>
 
 typedef int ID;
+
+// for parsing json
+bool ReadFromFile(const char* filename, char* buffer, int len);
+void ReadFromJson();
+void initCardCollection();
 
 class CardBase {
 public:
@@ -37,5 +44,7 @@ public:
 		is_doomed(cb->is_doomed), is_stubborn(cb->is_stubborn), is_leader(cb->is_leader), skill(cb->skill), deploySkill(cb->deploySkill),
 		deathWishSkill(cb->deathWishSkill), skillData(cb->skillData), deploySkillData(cb->deploySkillData), deathWishSkillData(cb->deathWishSkillData){};
 };
+
+std::vector<CardBase*> setDeck();
 
 #endif
