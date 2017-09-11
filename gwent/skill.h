@@ -22,7 +22,7 @@ enum SKILL {
 	MOVETOENEMYGRAVE,	// 상대방 무덤으로 이동
 	DRAWCARD,			// 카드 뽑기
 	STRENGTHEN,			// 강화
-	RESURRECT,			// 부활
+	RESURRECT,			// 부활 <- 필요 없네?
 	DESTROY,			// 파괴
 	DESTROYHIGHEST,		// 가장 강한 유닛 파괴
 	SPAWNWEATHER,		// 날씨 생성
@@ -44,10 +44,8 @@ enum SKILL {
 	CELAENOHARPY,
 	WOODLANDSPIRIT,
 	EARTHELEMENTAL,
-	CRONEWEAVESS,
-	CRONEWHISPESS,
-	CRONEBREWESS,
-	ARCHGRIFFIN,
+	CRONE,
+	ARCHGRIFFIN = 50,
 	CARANTHIR,
 	FRIGHTENER,
 	UNSEENELDER,
@@ -94,9 +92,7 @@ void geels(User* user, ID cardID, ID targetID, LO location, int data);
 void celaenoHarpy(User* user, ID cardID, ID targetID, LO location, int data);
 void woodlandSpirit(User* user, ID cardID, ID targetID, LO location, int data);
 void earthElemental(User* user, ID cardID, ID targetID, LO location, int data);
-void croneWeavess(User* user, ID cardID, ID targetID, LO location, int data);
-void croneWhispess(User* user, ID cardID, ID targetID, LO location, int data);
-void croneBrewess(User* user, ID cardID, ID targetID, LO location, int data);
+void crone(User* user, ID cardID, ID targetID, LO location, int data);
 void archgriffin(User* user, ID cardID, ID targetID, LO location, int data);
 void caranthir(User* user, ID cardID, ID targetID, LO location, int data);
 void frightener(User* user, ID cardID, ID targetID, LO location, int data);

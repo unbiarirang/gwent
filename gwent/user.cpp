@@ -5,6 +5,8 @@ extern SkillMap skillMap;
 extern std::vector<CardBase*> cardCollection;
 extern ID topOfDeck;
 
+const int PROTECT_SHIELD = 100;
+
 std::ostream& operator<<(std::ostream& os, const User* m)
 {
 	os << "===THESE ARE MY CARDS===" << std::endl;
@@ -333,6 +335,21 @@ void User::changeStrength(ID cardID, int v)
 
 	if (card == nullptr) return;
 
+	// calculate armor
+	int armor = card->getArmor();
+	if (armor <= 0) {}
+	else if (armor >= v) {
+		card->changeArmor(-v);
+		v = 0;
+	} else if (armor < v) {
+		card->changeArmor(-armor);
+		v = v - armor;
+	} else if (armor == PROTECT_SHIELD) {
+		card->changeArmor(-PROTECT_SHIELD);
+		v = 0;
+	}
+
+	// if the unit is dead
 	int prev_str = card->getStrength();
 	int is_dead = card->changeStrength(v);
 

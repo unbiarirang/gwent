@@ -38,9 +38,7 @@ void SkillMap::init()
 	skillMap.setSkill(SKILL::CELAENOHARPY, celaenoHarpy);
 	skillMap.setSkill(SKILL::WOODLANDSPIRIT, woodlandSpirit);
 	skillMap.setSkill(SKILL::EARTHELEMENTAL, earthElemental);
-	skillMap.setSkill(SKILL::CRONEWEAVESS, croneWeavess);
-	skillMap.setSkill(SKILL::CRONEWHISPESS, croneWhispess);
-	skillMap.setSkill(SKILL::CRONEBREWESS, croneBrewess);
+	skillMap.setSkill(SKILL::CRONE, crone);
 	skillMap.setSkill(SKILL::ARCHGRIFFIN, archgriffin);
 	skillMap.setSkill(SKILL::CARANTHIR, caranthir);
 	skillMap.setSkill(SKILL::FRIGHTENER, frightener);
@@ -619,19 +617,7 @@ void earthElemental(User * user, ID cardID, ID targetID, LO location, int data)
 	getArmor(user, cardID, targetID, location, 100); // protect shield
 }
 
-void croneWeavess(User * user, ID cardID, ID targetID, LO location, int data)
-{
-	summon(user, cardID, targetID, user->findLine(cardID), data);
-	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
-}
-
-void croneWhispess(User * user, ID cardID, ID targetID, LO location, int data)
-{
-	summon(user, cardID, targetID, user->findLine(cardID), data);
-	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
-}
-
-void croneBrewess(User * user, ID cardID, ID targetID, LO location, int data)
+void crone(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	summon(user, cardID, targetID, user->findLine(cardID), data);
 	summon(user, cardID, targetID, user->findLine(cardID), user->getCardFromID(cardID)->skillData);
@@ -742,15 +728,30 @@ void vranWarrior(User * user, ID cardID, ID targetID, LO location, int data)
 
 /*
 normal skill
-TODO: 혼자 피해 받을 때 armor 무시 해야함
 @ user
 @ data : damage
 */
 void arachasBehemoth(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	// TODO: arachas hatchling 아직 json에 추가 안함
-	spawn(user, cardID, targetID, LO(util::getRandNumBetween(LO::LINE1, LO::LINE3)), 32);
-	damage(user, cardID, cardID, location, data);
+	spawn(user, cardID, targetID, LO(util::getRandNumBetween(LO::LINE1, LO::LINE3)), 2);
+	
+	// receive damage but ignore armor
+	Card* card = user->getCardFromID(cardID);
+
+	if (card == nullptr) return;
+
+	// if the unit is dead
+	int prev_str = card->getStrength();
+	int is_dead = card->changeStrength(-data);
+
+	if (is_dead) {
+		user->changeRoundScoreForLine(location, -prev_str);
+		user->destroyCard(cardID);
+		return;
+	}
+
+	user->changeRoundScoreForLine(location, -data);
 }
 
 /*

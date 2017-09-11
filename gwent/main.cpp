@@ -82,8 +82,8 @@ int main() {
 	user1->drawCard(30);
 	user2->drawCard(30);
 
-	user1->deployCard(LO::LINE1, 22);
-	user1->deployCard(LO::LINE1, 17);
+	user1->deployCard(LO::LINE3, 16);
+	skillMap.getSkill(SKILL::ARACHASBEHEMOTH)(user1, 16, 0, LO::LINE3, 1);
 	cout << "user1 score: " << user1->getRoundScore() << endl;
 	cout << "user2 score: " << user2->getRoundScore() << endl;
 
