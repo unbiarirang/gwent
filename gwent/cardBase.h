@@ -8,8 +8,6 @@
 typedef int ID;
 
 // for parsing json
-bool ReadFromFile(const char* filename, char* buffer, int len);
-void ReadFromJson();
 void initCardCollection();
 
 class CardBase {

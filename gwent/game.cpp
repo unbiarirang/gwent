@@ -17,6 +17,7 @@ void Game::setCardsToDeck()
 	for (int i = 0; i < 2; i++) {
 		for (auto card : user[i]->cardMap) {
 			user[i]->deck.push_back(card.first);
+			// TODO: 그다음에 덱에는 안들어가지만 생성할 수 있는 카드 cardMap에 추가해줌
 		}
 	}
 }
