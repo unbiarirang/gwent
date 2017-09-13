@@ -27,18 +27,31 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     logindialog.cpp \
-    pagesetdeck.cpp \
     Qcard.cpp \
     clabel.cpp \
-    global.cpp
+    global.cpp \
+    cardBase.cpp \
+    card.cpp \
+    game.cpp \
+    skill.cpp \
+    user.cpp \
+    util.cpp \
+    page.cpp
 
 HEADERS += \
         mainwindow.h \
     logindialog.h \
-    pagesetdeck.h \
     Qcard.h \
     global.h \
-    clabel.h
+    clabel.h \
+    cardBase.h \
+    card.h \
+    enum.h \
+    game.h \
+    skill.h \
+    user.h \
+    util.h \
+    page.h
 
 FORMS += \
         mainwindow.ui \
@@ -46,3 +59,8 @@ FORMS += \
 
 RESOURCES += \
     images.qrc
+
+DISTFILES += \
+    json/json_vc71_libmtd.lib
+
+QT += concurrent

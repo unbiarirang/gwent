@@ -5,15 +5,11 @@
 #include <QWidget>
 #include <QLabel>
 
-namespace Qcard {
-void init();
-}
-
-class Card : public QLabel
+class QCard : public QLabel
 {
     Q_OBJECT
 public:
-    explicit Card(QWidget *parent = 0);
+    explicit QCard(QWidget *parent = 0);
 
     // enable drag and drop cards
     void mousePressEvent(QMouseEvent* event);

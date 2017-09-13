@@ -42,8 +42,8 @@ border-image: url(:/images/images/nithral.jpg) 0 0 0 0 strectch stretch;
 background-color:rgba(48, 132, 119, 100);
 }
 
-#frame_board1, #frame_board2 {
-border-image: url(:/images/images/board.jpg) 0 0 0 0 strectch stretch;
+#page_1p {
+border-image: url(:/images/images/board_fix.jpg) 0 0 0 0 strectch stretch;
 }
 
 #frame_setDeck {
@@ -57,7 +57,7 @@ background-color: rgba(48, 55, 133, 100)
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -99,7 +99,7 @@ color: rgb(200, 200, 200)
 }</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="page_login">
        <property name="sizePolicy">
@@ -393,6 +393,18 @@ color: rgb(220, 220, 220);
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QFrame" name="frame_setDeck2">
                <property name="minimumSize">
@@ -438,6 +450,18 @@ color: white;</string>
                   <property name="spacing">
                    <number>0</number>
                   </property>
+                  <property name="leftMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>1</number>
+                  </property>
                   <item>
                    <spacer name="verticalSpacer_2">
                     <property name="orientation">
@@ -457,14 +481,41 @@ color: white;</string>
                      <number>3</number>
                     </property>
                     <item>
-                     <widget class="QPushButton" name="button_setDeck_save">
+                     <widget class="QPushButton" name="butoon_setDeck_save2">
                       <property name="cursor">
                        <cursorShape>PointingHandCursor</cursorShape>
                       </property>
                       <property name="text">
-                       <string>SAVE</string>
+                       <string>SAVE P2</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="button_setDeck_save1">
+                      <property name="cursor">
+                       <cursorShape>PointingHandCursor</cursorShape>
+                      </property>
+                      <property name="text">
+                       <string>SAVE P1</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_10">
+                    <item>
+                     <spacer name="horizontalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
                     </item>
                     <item>
                      <widget class="QPushButton" name="button_setDeck_back">
@@ -475,6 +526,19 @@ color: white;</string>
                        <string>Back</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_4">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
                     </item>
                    </layout>
                   </item>
@@ -493,8 +557,17 @@ color: white;</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page4">
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <widget class="QWidget" name="page_1p">
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+font: 26pt &quot;Cambria&quot;;
+color: white;
+}</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -508,19 +581,765 @@ color: white;</string>
          <number>0</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="spacing">
-           <number>7</number>
+         <layout class="QGridLayout" name="glayout_page_1p" rowstretch="1,1,1,1,1,1,1,1" columnstretch="1,1,1,1,1,1,1,1,1,1">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMaximumSize</enum>
           </property>
-          <item>
-           <widget class="QFrame" name="frame_board1">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <item row="6" column="6">
+           <layout class="QHBoxLayout" name="l_hand3">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
             </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+           </layout>
+          </item>
+          <item row="1" column="5">
+           <layout class="QHBoxLayout" name="e22"/>
+          </item>
+          <item row="0" column="5">
+           <layout class="QHBoxLayout" name="e32"/>
+          </item>
+          <item row="7" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_24">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
             </property>
-           </widget>
+           </layout>
+          </item>
+          <item row="6" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="6" column="7">
+           <layout class="QHBoxLayout" name="l_hand2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="2" column="2">
+           <layout class="QHBoxLayout" name="e15"/>
+          </item>
+          <item row="3" column="2">
+           <layout class="QHBoxLayout" name="m15"/>
+          </item>
+          <item row="4" column="2">
+           <layout class="QHBoxLayout" name="m25"/>
+          </item>
+          <item row="2" column="5">
+           <layout class="QHBoxLayout" name="e12"/>
+          </item>
+          <item row="2" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_3">
+              <property name="text">
+               <string>Melee</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="5">
+           <layout class="QHBoxLayout" name="m12"/>
+          </item>
+          <item row="2" column="6">
+           <layout class="QHBoxLayout" name="e11"/>
+          </item>
+          <item row="3" column="6">
+           <layout class="QHBoxLayout" name="m11"/>
+          </item>
+          <item row="7" column="5">
+           <layout class="QHBoxLayout" name="l_hand11">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="7" column="6">
+           <layout class="QHBoxLayout" name="l_hand10">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="5" column="5">
+           <layout class="QHBoxLayout" name="m32"/>
+          </item>
+          <item row="6" column="5">
+           <layout class="QHBoxLayout" name="l_hand4">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="5" column="6">
+           <layout class="QHBoxLayout" name="m31"/>
+          </item>
+          <item row="1" column="6">
+           <layout class="QHBoxLayout" name="e21"/>
+          </item>
+          <item row="0" column="8">
+           <layout class="QHBoxLayout" name="horizontalLayout_55">
+            <item>
+             <widget class="QWidget" name="widget" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="7">
+           <layout class="QHBoxLayout" name="m_count3"/>
+          </item>
+          <item row="0" column="6">
+           <layout class="QHBoxLayout" name="e31"/>
+          </item>
+          <item row="4" column="7">
+           <layout class="QHBoxLayout" name="m_count2"/>
+          </item>
+          <item row="6" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <item>
+             <widget class="QWidget" name="widget_23" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_10"/>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="7">
+           <layout class="QHBoxLayout" name="e_count3"/>
+          </item>
+          <item row="7" column="3">
+           <layout class="QHBoxLayout" name="l_hand13">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="3">
+           <layout class="QHBoxLayout" name="e34"/>
+          </item>
+          <item row="7" column="2">
+           <layout class="QHBoxLayout" name="l_hand14">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="5" column="3">
+           <layout class="QHBoxLayout" name="m34"/>
+          </item>
+          <item row="4" column="4">
+           <layout class="QHBoxLayout" name="m23"/>
+          </item>
+          <item row="5" column="4">
+           <layout class="QHBoxLayout" name="m33"/>
+          </item>
+          <item row="7" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <item>
+             <widget class="QWidget" name="widget_10" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_33">
+            <item>
+             <widget class="QWidget" name="widget_22" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_29">
+            <item>
+             <widget class="QWidget" name="widget_7" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="5">
+           <layout class="QHBoxLayout" name="m22"/>
+          </item>
+          <item row="6" column="3">
+           <layout class="QHBoxLayout" name="l_hand6">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="6" column="2">
+           <layout class="QHBoxLayout" name="l_hand7">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="6" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QWidget" name="widget_9" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_9"/>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="7" column="4">
+           <layout class="QHBoxLayout" name="l_hand12">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="5" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <spacer name="verticalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_6">
+              <property name="text">
+               <string>Siege</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="6">
+           <layout class="QHBoxLayout" name="m21">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMaximumSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QWidget" name="widget_2" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="4">
+           <layout class="QHBoxLayout" name="m13"/>
+          </item>
+          <item row="6" column="4">
+           <layout class="QHBoxLayout" name="l_hand5">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="0" column="2">
+           <layout class="QHBoxLayout" name="e35"/>
+          </item>
+          <item row="5" column="2">
+           <layout class="QHBoxLayout" name="m35"/>
+          </item>
+          <item row="7" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_25">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QWidget" name="widget_24" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_21">
+            <item>
+             <widget class="QWidget" name="widget_12" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Siege</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="4">
+           <layout class="QGridLayout" name="e33"/>
+          </item>
+          <item row="1" column="4">
+           <layout class="QHBoxLayout" name="e23"/>
+          </item>
+          <item row="1" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_38">
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="4">
+           <layout class="QHBoxLayout" name="e13"/>
+          </item>
+          <item row="2" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_39">
+            <item>
+             <widget class="QWidget" name="widget_3" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_40">
+            <item>
+             <widget class="QWidget" name="widget_5" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="9">
+           <layout class="QHBoxLayout" name="horizontalLayout_41">
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="2">
+           <layout class="QHBoxLayout" name="e25"/>
+          </item>
+          <item row="1" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <spacer name="verticalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Ranged</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="3">
+           <layout class="QHBoxLayout" name="e14"/>
+          </item>
+          <item row="1" column="3">
+           <layout class="QHBoxLayout" name="e24"/>
+          </item>
+          <item row="3" column="3">
+           <layout class="QHBoxLayout" name="m14"/>
+          </item>
+          <item row="4" column="3">
+           <layout class="QHBoxLayout" name="m24"/>
+          </item>
+          <item row="1" column="8">
+           <layout class="QHBoxLayout" name="e_total_count">
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_totalScore2">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="8">
+           <layout class="QHBoxLayout" name="m_total_count">
+            <item>
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_totalScore1">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="7">
+           <layout class="QHBoxLayout" name="e_count2"/>
+          </item>
+          <item row="3" column="7">
+           <layout class="QHBoxLayout" name="m_count1"/>
+          </item>
+          <item row="2" column="7">
+           <layout class="QHBoxLayout" name="e_count1"/>
+          </item>
+          <item row="7" column="7">
+           <layout class="QHBoxLayout" name="l_hand9">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="7" column="8">
+           <layout class="QHBoxLayout" name="l_hand8">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="6" column="8">
+           <layout class="QHBoxLayout" name="l_hand1">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+           </layout>
+          </item>
+          <item row="2" column="8">
+           <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <item>
+             <widget class="QWidget" name="widget_4" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="8">
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <item>
+             <widget class="QWidget" name="widget_6" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="8">
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
+            <item>
+             <widget class="QWidget" name="widget_8" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QWidget" name="widget_14" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_22">
+            <item>
+             <widget class="QWidget" name="widget_16" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <spacer name="verticalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_4">
+              <property name="text">
+               <string>Melee</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_26">
+            <item>
+             <widget class="QWidget" name="widget_18" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <spacer name="verticalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_5">
+              <property name="text">
+               <string>Ranged</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item row="4" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_28">
+            <item>
+             <widget class="QWidget" name="widget_20" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_20">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <spacer name="horizontalSpacer_10">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>100</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>

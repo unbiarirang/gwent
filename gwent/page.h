@@ -1,5 +1,5 @@
-#ifndef PAGESETDECK_H
-#define PAGESETDECK_H
+#ifndef PAGE_H
+#define PAGE_H
 
 #include <QStackedWidget>
 #include <QPixmap>
@@ -10,9 +10,14 @@
 #include <QWidget>
 #include <QFrame>
 #include <QPushButton>
+#include "game.h"
 
-namespace Page {
+namespace PageSetDeck {
 void init(QWidget* page);
 }
 
-#endif // PAGESETDECK_H
+namespace Page1P {
+void startGame(QWidget* page, Game* game);
+}
+
+#endif // PAGE_H
