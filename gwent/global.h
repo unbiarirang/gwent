@@ -1,7 +1,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "Qcard.h"
 #include "clabel.h"
 #include "cardBase.h"
 #include <QLabel>

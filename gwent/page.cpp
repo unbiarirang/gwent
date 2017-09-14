@@ -1,5 +1,4 @@
 #include "page.h"
-#include "Qcard.h"
 #include "global.h"
 #include <QDebug>
 #include <QSignalMapper>
@@ -7,6 +6,7 @@
 
 std::map<ID, CLabel*> g_cardImagesSmall_1 = std::map<ID, CLabel*>();
 std::map<ID, CLabel*> g_cardImagesSmall_2 = std::map<ID, CLabel*>();
+extern std::vector<QPixmap> g_cardPixmapSmall;
 
 void PageSetDeck::init(QWidget* page) {
     QSignalMapper *m = new QSignalMapper();
@@ -32,6 +32,16 @@ void PageSetDeck::init(QWidget* page) {
 void Page1P::startGame(QWidget* page, Game* game) {
     QSignalMapper *m = new QSignalMapper();
     game->setCardsToDeck();
+
+     // insert empty cards into field
+    QGridLayout *glayout = page->findChild<QGridLayout*>("glayout_page_1p");
+    for (int i = 0; i < 10; i++) {
+        QPixmap pix = QPixmap();
+        pix = pix.scaled(100, 80, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+        CLabel *emptyLabel = new CLabel();
+        emptyLabel->setPixmap(pix);
+        glayout->addWidget(emptyLabel, 7, i, 1, 1);
+    }
 
     User* user1 = game->getUser(0);
     User* user2 = game->getUser(1);
@@ -74,6 +84,5 @@ void Page1P::startGame(QWidget* page, Game* game) {
     QObject::connect(m, SIGNAL(mapped(int)), page->parent()->parent()->parent(), SLOT(gameCardSelected(int)));
 
     game->decideOrder();
-    game->turn = 1; // FIXME: 나중에 없엠
     game->turnChange();
 }

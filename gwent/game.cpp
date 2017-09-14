@@ -20,58 +20,6 @@ void Game::setCardsToDeck()
 	}
 }
 
-void Game::startGame(QWidget* page) // FIXME: DELETE THIS FUNCTION
-{
-    bool is_gameFinished = false;
-    User* user1 = getUser(0);
-    User* user2 = getUser(1);
-    int status = 0;
-
-//    while (!is_gameFinished) {
-//        if (turn == 0) { // user1's turn
-//            // both of users gave up
-//            if (user1->getIsGiveUp() == true && user1->enemy->getIsGiveUp() == true) {
-//                finishRound();
-//                continue;
-//            }
-
-//            if (user1->getIsGiveUp() == true) {
-//                //emit signal: 턴 넘기기 slot: Game.nextTurn
-//                turn = 1;
-//                continue;
-//            }
-
-//            user1->drawCard(1);
-
-//            while(1) {
-
-//            }
-
-//            // 날씨 효과
-//            // timer가 돌아갈 동안 카드를 선택해서 내기 deployCard
-//            // 만약 시간이 다 됐으면 hand에서 카드 무작위로 한장 버리기
-//            // 그리고 턴을 넘기기 emit signal: 턴 넘기기 slot: Game.nextTurn
-
-//            turn = 1;
-//        } else {
-//            if (user2->getIsGiveUp() == true && user2->enemy->getIsGiveUp() == true) {
-//                finishRound();
-//                continue;
-//            }
-
-//            if (user2->getIsGiveUp() == true) {
-//                //emit signal: 턴 넘기기 slot: Game.nextTurn
-//                turn = 0;
-//                continue;
-//            }
-
-
-
-//            turn = 0;
-//        }
-//    }
-}
-
 void Game::turnChange()
 {
     if (turn == 0) turn = 1;
@@ -132,7 +80,7 @@ void Game::finishGame()
 {
     if (user[0]->getRoundScore() > user[1]->getRoundScore())
         winner = 0;
-    else if (user[0]->getRoundScore() > user[1]->getRoundScore())
+    else if (user[0]->getRoundScore() < user[1]->getRoundScore())
         winner = 1;
     else
         winner = 2;

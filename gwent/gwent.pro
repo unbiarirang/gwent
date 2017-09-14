@@ -27,7 +27,6 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     logindialog.cpp \
-    Qcard.cpp \
     clabel.cpp \
     global.cpp \
     cardBase.cpp \
@@ -41,7 +40,6 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     logindialog.h \
-    Qcard.h \
     global.h \
     clabel.h \
     cardBase.h \

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "Qcard.h"
 #include <QLabel>
 #include <vector>
 #include <QPixmap>
@@ -52,9 +51,9 @@ void Global::init() {
     g_cardNameMap[CARDNO::THUNDERBOLTPOTION] = "thunderboltPotion";
 
     // init cardInfo
-    int figures[][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    static int figures[][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 2, 1, 1, 1, 4, 1, 0, 6, 3, 0, 41, 0, 0, 0, 0},
-                           {0, 2, 0, 0, 0, 4, 2, 0, 4, 1, 0, 42, 0, 0, 0, 0},
+                           {0, 2, 0, 0, 0, 4, 2, 0, 4, 1, 0, 42, 0, 0, 2, 0},
                            {0, 2, 0, 0, 0, 4, 3, 0, 1, 3, 0, 43, 0, 0, 0, 0 },
                            {0, 2, 0, 0, 0, 4, 4, 0, 5, 1, 0, 44, 0, 0, 18, 0},
                            { 0, 2, 0, 0, 0, 4, 5, 0, 5, 3, 0, 45, 0, 23, 19, 0},
@@ -99,7 +98,6 @@ void Global::init() {
     QPixmap imageSmall[32];
     CLabel* imageLabel[32];
     CLabel* imageLabelSmall[32];
-    CLabel* imageLabelSmall_2[32];
     int i = 0;
 
     // load card images
@@ -118,7 +116,7 @@ void Global::init() {
 //        imageLabelSmall[i] = new CLabel();
 //        imageLabelSmall[i]->setPixmap(imageSmall[i]);
 //        imageLabelSmall[i]->setScaledContents(true);
-//        g_cardImagesSmall_1.push_back(imageLabelSmall[i]);
+//        g_cardImagesSmall.push_back(imageLabelSmall[i]);
 
 //        imageLabelSmall_2[i] = new CLabel();
 //        imageLabelSmall_2[i]->setPixmap(imageSmall[i]);

@@ -5,7 +5,6 @@
 #include "page.h"
 #include "global.h"
 #include "cardBase.h"
-#include "Qcard.h"
 #include "enum.h"
 #include <QTimer>
 #include <QDialog>
@@ -20,6 +19,8 @@
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 
 extern std::map<ID, CLabel*> g_cardImagesSmall_1;
 extern std::map<ID, CLabel*> g_cardImagesSmall_2;
@@ -62,7 +63,17 @@ void MainWindow::showLoginDialog()
 void MainWindow::goToMenu(QString username)
 {
     changeStackedWidget(ui->page_menu);
-    ui->label_username->setText("hi, " + username);
+    ui->label_username->setText("   hi, " + username);
+    ui->label_username->setStyleSheet("font: 15pt 'Cambria'; color: rgb(220, 220, 220);");
+
+    // falling label animation
+    QPropertyAnimation *animation;
+    animation = new QPropertyAnimation(ui->label_username, "geometry");
+    animation->setDuration(2000);
+    animation->setStartValue(QRect(0, 0, 100, 30));
+    animation->setEndValue(QRect(0, 130, 100, 30));
+    animation->setEasingCurve(QEasingCurve::OutBounce);
+    animation->start();
 }
 
 void MainWindow::on_button_login_clicked()
@@ -90,9 +101,6 @@ void MainWindow::cardSelected(int x)
     label->setText(name);
 
     vlayout->insertWidget(0, label);
-
-    qDebug() << "click the card";
-
     deck.push_back(x);
 }
 
@@ -254,6 +262,7 @@ void MainWindow::on_button_menu_1p_clicked()
     connect(this, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
     connect(game, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
     connect(user1, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
+
     timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, SIGNAL(timeout()), game, SLOT(turnChange()));
@@ -266,26 +275,22 @@ void MainWindow::on_button_menu_1p_clicked()
 
 void MainWindow::gameCardSelected(int id)
 {
-    qDebug() << "click the card cardID:" << id;
     cardID = id;
 
-//    QTimer *timer = new QTimer(this);
-//    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-//    timeCount = 0;
-//    timer->start(1000);
-
     User* user = game->getUser(game->turn);
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
 
     Card* card = user->getCardFromID(cardID);
     if (card == nullptr) return;
-    int no = user->getCardFromID(cardID)->no;
+
+    int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    int index = glayout->indexOf(g_cardImagesSmall[cardID]);
+    int index = glayout->indexOf(cardImagesSmall[cardID]);
     if (index == -1) return;
-    auto pos = gridPosition(g_cardImagesSmall[cardID]);
+
+    auto pos = gridPosition(cardImagesSmall[cardID]);
     if (pos.first == 3 || pos.first == 4 || pos.first == 5) // select a card on my line
         emit selectCardMyLine(ID(cardID), LO(pos.first)); // ID/LO
     if (pos.first == 2 || pos.first == 1 || pos.first == 0)
@@ -293,54 +298,42 @@ void MainWindow::gameCardSelected(int id)
 }
 void MainWindow::on_pushButton_3_clicked()
 {
-    qDebug() << "line 1 clicked";
     emit placeCard(LO::LINE1, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    qDebug() << "line 2 clicked";
     emit placeCard(LO::LINE2, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-    qDebug() << "line 3 clicked";
     emit placeCard(LO::LINE3, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    qDebug() << "line 1 clicked";
     emit placeCard(LO::LINE1, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    qDebug() << "line 2 clicked";
     emit placeCard(LO::LINE2, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
 
 void MainWindow::on_pushButton_6_clicked()
 {
-    qDebug() << "line 3 clicked";
     emit placeCard(LO::LINE3, ID(cardID));
-    //emit turnChangedSignal();
     game->getUser(0)->timer->stop();
     timer->start(1000);
 }
@@ -353,9 +346,11 @@ void MainWindow::update()
 
 QPair<int,int> gridPosition(QWidget * widget) {
   auto gp = qMakePair(-1,-1);
-  if (! widget->parentWidget()) return gp;
+  if (!widget->parentWidget()) return gp;
+
   auto layout = widget->parentWidget()->findChild<QGridLayout*>("glayout_page_1p");
-  if (! layout) return gp;
+  if (!layout) return gp;
+
   int index = layout->indexOf(widget);
   Q_ASSERT(index >= 0);
   int rs,cs;
@@ -371,22 +366,18 @@ void MainWindow::removeCardFromHand(int cardID)
     Card* card = user->getCardFromID(cardID);
     if (card == nullptr) return;
 
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
 
     int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    int index = glayout->indexOf(g_cardImagesSmall[cardID]);
+    int index = glayout->indexOf(cardImagesSmall[cardID]);
     if (index == -1) return;
 
 
-    auto pos = gridPosition(g_cardImagesSmall[cardID]);
+    auto pos = gridPosition(cardImagesSmall[cardID]);
     emptyDeckSpace->push_back(pos);
-    // remove a card from deck 옮기는 거면 지울 필요가 없는듯?
-    //glayout->takeAt(index)->widget();
-
-//    deployCard(cardID, line);
 }
 
 void MainWindow::drawCard(int id)
@@ -399,12 +390,12 @@ void MainWindow::drawCard(int id)
     if (card == nullptr) return;
     int no = card->no;
 
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
 
     QGridLayout *glayout = ui->glayout_page_1p;
-    glayout->addWidget(g_cardImagesSmall[id], pos.first, pos.second, 1, 1);
+    glayout->addWidget(cardImagesSmall[id], pos.first, pos.second, 1, 1);
 }
 
 void MainWindow::deployCardToLine(int cardID, int line)
@@ -413,6 +404,7 @@ void MainWindow::deployCardToLine(int cardID, int line)
     User* user = game->getUser(game->turn);
     Card* card = user->getCardFromID(cardID);
     if (card == nullptr) return;
+
     int no = user->getCardFromID(cardID)->no;
     QGridLayout *glayout = ui->glayout_page_1p;
 
@@ -434,20 +426,14 @@ void MainWindow::deployCardToLine(int cardID, int line)
         return;
     }
 
-    //bool is_return = user->deployCard(LO(line+2), cardID);
-//    if (is_return) { // user selected wrong line
-//        revoke(cardID, line);
-//        return;
-//    }
-
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
 
     // insert a card into the line
     auto pos = (*emptyLine)[(*emptyLine).size()-1];
     (*emptyLine).pop_back();
-    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
+    glayout->addWidget(cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 
     // insert a empty card into previous card location
     QPixmap pix = QPixmap();
@@ -463,11 +449,16 @@ void MainWindow::deployWeather(int cardID, int line)
     qDebug() << "Weather cardID: " << cardID;
     User* user = game->getUser(game->turn);
     Card* card = user->getCardFromID(cardID);
-    if (card == nullptr) { // weather card
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
+
+    if (card == nullptr) { // enemy's weather card
         user = user->enemy;
         card = user->getCardFromID(cardID);
     }
     if (card == nullptr) return;
+
     int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
 
@@ -489,14 +480,10 @@ void MainWindow::deployWeather(int cardID, int line)
         return;
     }
 
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
-
     // insert a card into the line
     auto pos = (*emptyLine)[(*emptyLine).size()-1];
     (*emptyLine).pop_back();
-    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
+    glayout->addWidget(cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 
     // insert a empty card into previous card location
     QPixmap pix = QPixmap();
@@ -520,14 +507,13 @@ void MainWindow::removeCard(int cardID, int line)
 
     int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    std::map<ID, CLabel*>* g_cardImagesSmall = new std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = &g_cardImagesSmall_1;
-    else g_cardImagesSmall = &g_cardImagesSmall_2;
+    std::map<ID, CLabel*>* cardImagesSmall = new std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = &g_cardImagesSmall_1;
+    else cardImagesSmall = &g_cardImagesSmall_2;
 
-    int index = glayout->indexOf((*g_cardImagesSmall)[cardID]);
-    qDebug() << "(in remove card)index: " << index;
+    int index = glayout->indexOf((*cardImagesSmall)[cardID]);
     if (index == -1) return;
-    auto pos = gridPosition((*g_cardImagesSmall)[cardID]);
+    auto pos = gridPosition((*cardImagesSmall)[cardID]);
 
     std::vector<QPair<int,int>>* emptyLine;
     if (user == game->getUser(0)) {
@@ -546,27 +532,22 @@ void MainWindow::removeCard(int cardID, int line)
     if (QLayoutItem *w = glayout->takeAt(index)) {
         delete w;
     }
-    if ((*g_cardImagesSmall)[cardID])
-        delete (*g_cardImagesSmall)[cardID];
+    if ((*cardImagesSmall)[cardID])
+        delete (*cardImagesSmall)[cardID];
 }
 
 void MainWindow::revoke(int cardID, int line)
 {
-    qDebug() << "emptyDeckSpace: " << (*emptyDeckSpace);
     auto pos = (*emptyDeckSpace)[emptyDeckSpace->size()-1];
     emptyDeckSpace->pop_back();
-    qDebug() << "emptyDeckSpacke.pop_back(): " << pos.first<< ", " << pos.second;
     User* user = game->getUser(game->turn);
-    Card* card = user->getCardFromID(cardID);
-    if (card == nullptr) return;
-    int no = card->no;
 
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = g_cardImagesSmall_1;
+    else cardImagesSmall = g_cardImagesSmall_2;
 
     QGridLayout *glayout = ui->glayout_page_1p;
-    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
+    glayout->addWidget(cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 }
 
 void MainWindow::changeRoundScore()
@@ -583,35 +564,35 @@ void MainWindow::changeRoundScore()
 void MainWindow::changeUnitScore(int cardID)
 {
     User* user = game->getUser(game->turn);
-    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
-    QLabel *label = g_cardImagesSmall[cardID]->findChild<QLabel*>();
+    std::map<ID, CLabel*> cardImagesSmall = std::map<ID, CLabel*>();
+    cardImagesSmall = g_cardImagesSmall_1;
+
+    if (cardImagesSmall[cardID] == nullptr) cardImagesSmall = g_cardImagesSmall_2;
+    if (cardImagesSmall[cardID] == nullptr) return;
+    if (user->getCardFromID(cardID) == nullptr) user = user->enemy;
+    if (user->getCardFromID(cardID) == nullptr) return;
+
+    QLabel *label = cardImagesSmall[cardID]->findChild<QLabel*>();
     label->setText(QString::number(user->getCardFromID(cardID)->getStrength()));
 }
 
+std::vector<QLabel*> scoreLabels = std::vector<QLabel*>();
 void MainWindow::spawnCard(int no, int id)
 {
     User* user = game->getUser(game->turn);
-    std::map<ID, CLabel*>* g_cardImagesSmall = new std::map<ID, CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = &g_cardImagesSmall_1;
-    else g_cardImagesSmall = &g_cardImagesSmall_2;
+    std::map<ID, CLabel*>* cardImagesSmall = new std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) cardImagesSmall = &g_cardImagesSmall_1;
+    else cardImagesSmall = &g_cardImagesSmall_2;
 
     CLabel* label = new CLabel();
     label->setPixmap(g_cardPixmapSmall[no-1]);
     label->setScaledContents(true);
     labels.push_back(label);
-    (*g_cardImagesSmall)[id] = label;
+    (*cardImagesSmall)[id] = label;
 
-    QSignalMapper *m = new QSignalMapper();
-    QObject::connect((*g_cardImagesSmall)[id], SIGNAL(clicked()), m, SLOT(map()));
-    m->setMapping((*g_cardImagesSmall)[id], id);
-    QObject::connect(m, SIGNAL(mapped(int)), this, SLOT(gameCardSelected(int)));
-
-    QLabel *scoreLabel = new QLabel((*g_cardImagesSmall)[id]);
-    scoreLabel->setText("  " + QString::number(user->getCardFromID(id)->strength));
-
-    qDebug() << "spawned a card id : " << id;
+    QLabel *scoreLabel = new QLabel((*cardImagesSmall)[id]);
+    scoreLabel->setText("  " + QString::number(g_cardCollection[no-1]->strength));
+    scoreLabels.push_back(scoreLabel);
 }
 
 void MainWindow::finishGame()

@@ -1,5 +1,6 @@
 #include "skill.h"
 #include "enum.h"
+#include <QtConcurrent>
 
 SkillMap skillMap;	// for common use to every source file
 ID topOfDeck = ID(); // for the skill of Geels
@@ -202,11 +203,20 @@ void strengthen(User* user, ID cardID, ID targetID = 0, LO location = LO(), int 
 	user->changeStrength(cardID, data);
 }
 
-// 실행 카드와 같은 라인에 부활
+/*
+실행 카드와 같은 라인에 부활
+@ user
+@ location
+@ targetID
+ */
 void resurrect(User* user, ID cardID, ID targetID = 0, LO location = LO(), int data = 0)
 {
+    if (user->line[location-3].size() >= 5) return;
+
+    //TODO: targetID랑 location 입력 받아야함. 지금 location은 카드가 놓아진 위치랑 같은곳
 	user->removeFrom(LO::GRAVE, targetID);
-	user->insertInto(user->findLine(cardID), targetID);
+    user->insertInto(location, targetID);
+    QtConcurrent::run(user, &User::useSkill, SKILLKIND::DEPLOY, targetID, ID(), location);
 }
 
 /*
@@ -273,15 +283,16 @@ void rally(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 */
 void firstLight(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
-	// clear skies
+    data = util::getRandNumBetween(0, 1);
+    // clear skies
 	if (data == 0) {
 		for (int i = LO::LINE1; i <= LO::LINE3; i++) {
-			removeWeather(user, cardID, targetID, location, i);
+            removeWeather(user, cardID, targetID, LO(i), data);
 		}
 		return;
 	}
 
-	location = LO::LINE1; // FIXME: 입력 받아야함
+    // FIXME: location 입력 받아야함
 	// rally
 	rally(user, cardID, targetID, location, data);
 }
@@ -392,14 +403,14 @@ void bekkersTwistedMirror(User * user, ID cardID, ID targetID, LO location = LO(
 */
 void geraltIgni(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
-	LO lo = user->findLine(cardID);
+    LO lo = location;
 	int totalStr = 0;
 
-	for (auto id : user->enemy->line[lo - 3]) {
+    for (auto id : user->enemy->line[location - 3]) {
 		totalStr += user->enemy->getCardFromID(id)->getStrength();
 	}
 
-	if (totalStr < 25) return;
+    if (totalStr < 25) return;
 
 	// select all highest cards from enemy's line
 	std::vector<ID> highestCardIDs;
@@ -440,7 +451,7 @@ void roach(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 }
 
 /*
-미안하지만 가운데 기준으로 3명
+미안하지만 왼쪽부터 3명
 @ user
 @ targetID
 @ location
@@ -448,27 +459,37 @@ void roach(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0
 */
 void thunderboltPotion(User * user, ID cardID, ID targetID, LO location = LO(), int data = 0)
 {
-	std::vector<ID> unitIDs = user->getUnitIDs(location);
-	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), targetID));
+    //FIXME: need targetID
+//	std::vector<ID> unitIDs = user->getUnitIDs(location);
+//	auto pos = std::distance(unitIDs.begin(), find(unitIDs.begin(), unitIDs.end(), targetID));
 
-	if (pos >= unitIDs.size()) //target card not found
-		return;
+//	if (pos >= unitIDs.size()) //target card not found
+//		return;
 
-	getArmor(user, unitIDs[pos], targetID, location, user->getCardFromID(cardID)->skillData);
-	boost(user, cardID, unitIDs[pos], location, data);
+//	getArmor(user, unitIDs[pos], targetID, location, user->getCardFromID(cardID)->skillData);
+//	boost(user, cardID, unitIDs[pos], location, data);
 
-	auto p = pos + 1;
-	if (p < unitIDs.size()) { //there is a card one the right side of the target card
-		getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
-		boost(user, cardID, unitIDs[p], location, data);
-	}
+//	auto p = pos + 1;
+//	if (p < unitIDs.size()) { //there is a card one the right side of the target card
+//		getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
+//		boost(user, cardID, unitIDs[p], location, data);
+//	}
 
-	p = pos - 1;
-	if (p < 0) //no card one the left side of the target card
-		return;
+//	p = pos - 1;
+//	if (p < 0) //no card one the left side of the target card
+//		return;
 
-	getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
-	boost(user, cardID, unitIDs[p], location, data);
+//	getArmor(user, unitIDs[p], targetID, location, user->getCardFromID(cardID)->skillData);
+//	boost(user, cardID, unitIDs[p], location, data);
+
+    // max 3 units on the left side
+    int count = 0;
+    for (auto id : user->line[location-3]) {
+        getArmor(user, id, targetID, location, user->getCardFromID(cardID)->skillData);
+        boost(user, cardID, id, location, data);
+        count++;
+        if (count == 3) break;
+    }
 }
 
 /*
@@ -478,7 +499,9 @@ void thunderboltPotion(User * user, ID cardID, ID targetID, LO location = LO(), 
 */
 void dagon(User * user, ID cardID, ID targetID, LO location, int data)
 {
-	data = 22; // FIXME: 날씨 배치할 location이랑 data 받아야하는데 어떻게 받을지 고민
+    // FIXME: 날씨 배치할 location이랑 data 받아야하는데 어떻게 받을지 고민
+    // pick up a weather randomly
+    data = util::getRandNumBetween(22,24);
     spawn(user, cardID, targetID, location, data);
 }
 
@@ -493,7 +516,9 @@ void foglet(User * user, ID cardID, ID targetID, LO location, int data)
 
 	//whether there is fog on the enemy's line
 	for (int i = LO::LINE1; i <= LO::LINE3; i++) {
-		Card* card = enemy->getCardFromID(enemy->getWeatherCardIDFromLine(LO(i)));
+        ID weatherID = enemy->getWeatherCardIDFromLine(LO(i));
+        Card* card = enemy->getCardFromID(weatherID);
+        if (card == nullptr) card = user->getCardFromID(weatherID);
 		if (card != nullptr) {
 			if (card->no == 23) {  //impenetrableFog
 				is_fog = true;
@@ -506,16 +531,16 @@ void foglet(User * user, ID cardID, ID targetID, LO location, int data)
 
 	//look up the deck first
 	for (auto id : user->deck) {
-		if (user->getCardFromID(id)->no == 23) {
-			user->deployCard(user->findLine(cardID), id);
+        if (user->getCardFromID(id)->no == data) {
+            user->deployCard(location, id);
 			return;
 		}
 	}
 
 	//then look up the grave
 	for (auto id : user->grave) {
-		if (user->getCardFromID(id)->no == 23) {
-			user->deployCard(user->findLine(cardID), id);
+        if (user->getCardFromID(id)->no == data) {
+            resurrect(user, cardID, id, location, data);
 			return;
 		}
 	}
@@ -561,17 +586,19 @@ void geels(User * user, ID cardID, ID targetID, LO location, int data)
 
 	// TODO:여기서 데이터를 입력받아야함. 실버카드를 고를지 골드카드를 고를지
 	// TODO: 어디다가 둘지도 받아야함 location
-	data = TYPE::SILVER;
-	LO lo = LO::LINE1;
+    data = util::getRandNumBetween(TYPE::SILVER, TYPE::GOLD);
+    LO lo = LO(util::getRandNumBetween(LO::LINE1, LO::LINE3));
 
 	if (data == TYPE::SILVER && silverCardID != ID()) {
 		user->deployCard(lo, silverCardID);
 		user->discardCard(goldCardID);
-		topOfDeck = goldCardID;
+        if (goldCardID != ID())
+            topOfDeck = goldCardID;
 	} else if (data == TYPE::GOLD && goldCardID != ID()) {
 		user->deployCard(lo, goldCardID);
 		user->discardCard(silverCardID);
-		topOfDeck = silverCardID;
+        if (silverCardID != ID())
+            topOfDeck = silverCardID;
 	}
 }
 
@@ -613,9 +640,10 @@ void crone(User * user, ID cardID, ID targetID, LO location, int data)
 
 void archgriffin(User * user, ID cardID, ID targetID, LO location, int data)
 {
-	LO lo = LO::LINE1; // FIXME: 라인 입력 받아야 함
-	removeWeather(user, cardID, targetID, lo, data);
+    // FIXME: need location input
+    removeWeather(user, cardID, targetID, location, data);
 
+    // bring the enemy's one bronze card back from the enemy's grave to my grave
 	std::vector<ID> bronzeIDs = std::vector<ID>();
 	std::vector<ID> unitIDs = user->enemy->getUnitIDs(LO::GRAVE);
 	for (auto id : unitIDs) {
@@ -638,11 +666,12 @@ void archgriffin(User * user, ID cardID, ID targetID, LO location, int data)
 */
 void caranthir(User * user, ID cardID, ID targetID, LO location, int data)
 {
-	// FIXME: targetID, location 받아야함
-	targetID = 1;
-	user->enemy->removeFrom(user->enemy->findLine(targetID), targetID);
-	user->enemy->insertInto(location, targetID);
-	spawn(user, cardID, targetID, location, data);
+    // FIXME: targetID, location 받아야함. 그리고 라인 무시하는 기능도 추가 필요
+//	targetID = 1;
+//	user->enemy->removeFrom(user->enemy->findLine(targetID), targetID);
+//	user->enemy->insertInto(location, targetID);
+
+    spawn(user, cardID, targetID, location, data); // spawn frost
 }
 
 /*
@@ -651,11 +680,17 @@ void caranthir(User * user, ID cardID, ID targetID, LO location, int data)
 */
 void frightener(User * user, ID cardID, ID targetID, LO location, int data)
 {
-	// FIXME: targetID 받아야함
-	targetID = 1;
-	user->removeFrom(user->findLine(targetID), targetID);
-	user->insertInto(location, targetID);
-	drawCard(user, cardID, targetID, location, data);
+    // FIXME: targetID 받아야함. 그리고 라인 무시하는 기능도 추가 필요
+//    for (int i = LO::LINE1; i <= LO::LINE3; i++) {
+//        if (user->deck[i-3].size() > 0) {
+//            targetID = user->deck[i-3][0];
+//            break;
+//        }
+//    }
+//	user->removeFrom(user->findLine(targetID), targetID);
+//	user->insertInto(location, targetID);
+
+    drawCard(user, cardID, targetID, location, data); // draw one card
 }
 
 /*
@@ -669,13 +704,11 @@ void unseenElder(User * user, ID cardID, ID targetID, LO location, int data)
 	if (user->getCardFromID(cardID)->skillData <= 0) return;
 
 	for (int i = 0; i < 3; i++) {
-		int unitCount = 0;
-		for (int j = 0; j < 3; j++)
-			unitCount += user->line[j].size();
-		if (unitCount <= 1) return;	// no unit except the unseenElder
+        int unitCount = user->line[location-3].size();
+        if (unitCount <= 1) break;	// no unit except the unseenElder
 
 		// FIXME: targetID 받아야함
-		targetID = i + 1;
+        targetID = user->line[location-3][i];
 		consume(user, cardID, targetID, location, data);
 	}
 	user->getCardFromID(cardID)->skillData -= 1;
@@ -761,5 +794,5 @@ void wildHuntRider(User * user, ID cardID, ID targetID, LO location, int data)
 void harpyEgg(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	// TODO: 하피 해츨링 아직 json에 추가 안함
-	spawn(user, cardID, targetID, location, 31);
+    //spawn(user, cardID, targetID, location, 31);
 }

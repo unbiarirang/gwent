@@ -57,6 +57,9 @@ void User::discardCard(ID cardID)
 void User::deployCard(LO lo, ID cardID)
 {
 	Card* card = getCardFromID(cardID);
+    if (card == nullptr) card = enemy->getCardFromID(cardID);
+    if (card == nullptr) return;
+
 	// wrong location to deploy card
 	if (!(lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3))
         return;
@@ -408,8 +411,8 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 	skill f = nullptr;
 	int data = 0;
 
-	if (card == nullptr)
-		card = enemy->getCardFromID(cardID);
+    if (card == nullptr) card = enemy->getCardFromID(cardID);
+    if (card == nullptr) return;
 
 	switch (kind) {
 	case SKILLKIND::NORMAL: {
@@ -447,7 +450,8 @@ void User::changeStrength(ID cardID, int v) // v is + or -
 {
 	Card* card = getCardFromID(cardID);
 
-	if (card == nullptr) return;
+    if (card == nullptr) card = enemy->getCardFromID(cardID);
+    if (card == nullptr) return;
 
 	// calculate armor
 	int armor = card->getArmor();

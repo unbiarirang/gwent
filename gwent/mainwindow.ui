@@ -99,7 +99,7 @@ color: rgb(200, 200, 200)
 }</string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_login">
        <property name="sizePolicy">
@@ -277,12 +277,10 @@ color: white;
              <item>
               <widget class="QLabel" name="label_username">
                <property name="styleSheet">
-                <string notr="true">font: 12pt &quot;Cambria&quot;;
-color: rgb(220, 220, 220);
-</string>
+                <string notr="true"/>
                </property>
                <property name="text">
-                <string>hi, username</string>
+                <string>  hi, username</string>
                </property>
               </widget>
              </item>

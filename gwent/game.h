@@ -20,8 +20,6 @@ public:
 		int user1Score;
 	} score[3];
 
-	// FIXME: QTimer timer Ãß°¡
-
 public:
 	Game(User* _user0, User* _user1) {
 		round = 1;
@@ -40,7 +38,6 @@ signals:
 public slots:
 	void decideOrder();
 	void setCardsToDeck();
-    void startGame(QWidget* page);
 	void finishRound();
 	void finishGame();
 	void removeLineWeather(User* u, int i);
