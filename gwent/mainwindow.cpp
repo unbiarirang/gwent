@@ -33,6 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->page_login->setStyleSheet("#page_login {border-image: url(:/images/images/wallpaper.jpg) 0 0 0 0 strectch stretch;}");
+    ui->page_menu->setStyleSheet("#page_menu {border-image: url(:/images/images/ciri.jpg) 0 0 0 0 strectch stretch;}");
+    ui->page_setDeck->setStyleSheet("#page_setDeck {border-image: url(:/images/images/nithral.jpg) 0 0 0 0 strectch stretch;}");
+    ui->frame_mainMenu->setStyleSheet("#frame_mainMenu {background-color:rgba(48, 132, 119, 100);} QPushButton {background-color: rgba(255, 255, 255, 0);border: 0px;font: 75 20pt 'Cambria';color: rgb(220, 220, 220);text-align: left;}QPushButton:hover {color: white;}");
+    ui->page_1p->setStyleSheet("#page_1p {border-image: url(:/images/images/board_fix.jpg) 0 0 0 0 strectch stretch;} QLabel {font: 15pt 'Cambria';color: white;}#label_totalScore1, #label_totalScore2 {font: 26pt 'Cambria';color: white;}");
+    ui->frame_setDeck->setStyleSheet("#frame_setDeck {background-color: rgba(48, 55, 133, 100)}");
 
     QTimer::singleShot(100, this, SLOT(showLoginDialog()));
 
@@ -166,17 +172,17 @@ void MainWindow::on_button_menu_1p_clicked()
 {
     changeStackedWidget(ui->page_1p);
 
-    std::vector<CardBase*> defaultCollection = g_cardCollection; // TODO: default deck도 하나 만들어 놔야함
+    std::vector<CardBase*> defaultCollection = g_cardCollection; // TODO: make default deck
     std::vector<CardBase*> cardCollection1 = std::vector<CardBase*>();
     std::vector<CardBase*> cardCollection2 = std::vector<CardBase*>();
     if (deck1 == std::vector<int>())    // didn't save deck
-        cardCollection1 = defaultCollection; // default deck TODO: 카드 고르는 제한 만들기
+        cardCollection1 = defaultCollection; // default deck
     else {
         for (auto cardNo : deck1)
             cardCollection1.push_back(g_cardCollection[cardNo - 1]);
     }
     if (deck2 == std::vector<int>())    // didn't save deck
-        cardCollection2 = defaultCollection; // default deck TODO: 카드 고르는 제한 만들기
+        cardCollection2 = defaultCollection; // default deck
     else {
         for (auto cardNo : deck2)
             cardCollection2.push_back(g_cardCollection[cardNo - 1]);

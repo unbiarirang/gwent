@@ -62,3 +62,7 @@ DISTFILES += \
     json/json_vc71_libmtd.lib
 
 QT += concurrent
+
+QMAKE_LFLAGS += -static-libgcc
+
+CONFIG += release

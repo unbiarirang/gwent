@@ -64,7 +64,7 @@ void User::deployCard(LO lo, ID cardID)
 	if (!(lo == LO::LINE1 || lo == LO::LINE2 || lo == LO::LINE3))
         return;
 
-	// wrong location to deploy card TODO: 그럼 에러 주고 다시 고르게 해야함
+    // wrong location to deploy card
 	if (card->line != LINE::WEATHER && card->line != LINE::ANY && card->line != LINE::EVENT
 		&& (card->line != lo - 2))
         return;
@@ -77,7 +77,7 @@ void User::deployCard(LO lo, ID cardID)
 		removeFrom(LO::HAND, cardID);
 		enemy->insertInto(lo, cardID);
 	} else {
-        // 이때 라인에 꽉 찼나 안찼나 검사
+        // check if the lines are full
         if (line[lo-3].size() >= 5) return;
 		removeFrom(LO::HAND, cardID);
 		insertInto(lo, cardID);
@@ -307,13 +307,13 @@ void User::myTurn()
 {
 	// both of users gave up
 	if (getIsGiveUp() == true && enemy->getIsGiveUp() == true) {
-		//emit signal: 라운드 종료 slot: Game.finishRound
+        // emit finish round
         emit turnChangedSignal();
 		return;
 	}
 
 	if (getIsGiveUp() == true) {
-		//emit signal: 턴 넘기기 slot: Game.nextTurn
+        // emit turn change
         emit turnChangedSignal();
 		return;
 	}
@@ -331,10 +331,10 @@ void User::myTurn()
 
     drawCard(1);
 
-    // wait for 10 seconds
+    // wait for user 10 seconds
     timer->start(10 * 1000);
 
-	// 날씨 효과
+    // FIXME: 날씨 효과
 	// 만약 시간이 다 됐으면 hand에서 카드 무작위로 한장 버리기
 }
 
@@ -426,7 +426,7 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 		break;
 	}
 	case SKILLKIND::DEATHWISH: {
-        f = skillMap.getSkill(SKILL(card->needTarget)); // 하피 알만 deathwish 있음
+        f = skillMap.getSkill(SKILL(card->needTarget)); // only harpy egg have a deathwish skill
         data = card->needTarget;
 		break;
 	}
@@ -434,10 +434,7 @@ void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
 
     if (f == nullptr) return; // no skill
 
-//    if (card == nullptr || card->line == LINE::WEATHER)
-//        f(this->enemy, cardID, targetID, location, data);
-//    else
-        f(this, cardID, targetID, location, data);
+    f(this, cardID, targetID, location, data);
 
     if (card->line == LINE::EVENT) {	// remove the event card
 		removeFrom(findLine(cardID), cardID);

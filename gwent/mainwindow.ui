@@ -26,29 +26,12 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">#page_login {
-border-image: url(:/images/images/wallpaper.jpg) 0 0 0 0 strectch stretch;
-}
-
-#page_menu {
-border-image: url(:/images/images/ciri.jpg) 0 0 0 0 strectch stretch;
-}
-
-#page_setDeck {
-border-image: url(:/images/images/nithral.jpg) 0 0 0 0 strectch stretch;
-}
-
-#frame_mainMenu {
-background-color:rgba(48, 132, 119, 100);
-}
-
-#page_1p {
-border-image: url(:/images/images/board_fix.jpg) 0 0 0 0 strectch stretch;
-}
-
-#frame_setDeck {
-background-color: rgba(48, 55, 133, 100)
-}</string>
+   <string notr="true">#page_login {border-image: url(:/images/images/wallpaper.jpg) 0 0 0 0 strectch stretch;}
+#page_menu {border-image: url(:/images/images/ciri.jpg) 0 0 0 0 strectch stretch;}
+#page_setDeck {border-image: url(:/images/images/nithral.jpg) 0 0 0 0 strectch stretch;}
+#frame_mainMenu {background-color:rgba(48, 132, 119, 100);}
+#page_1p {border-image: url(:/images/images/board_fix.jpg) 0 0 0 0 strectch stretch;}
+#frame_setDeck {background-color: rgba(48, 55, 133, 100)}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -99,7 +82,7 @@ color: rgb(200, 200, 200)
 }</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_login">
        <property name="sizePolicy">
