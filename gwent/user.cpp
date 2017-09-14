@@ -24,6 +24,8 @@ std::ostream& operator<<(std::ostream& os, const User* m)
 /* treat card */
 void User::drawCard(int count)
 {
+    if (deck.size() <= 0) return;
+
 	int cardNum, cardIndex;
 	ID cardID;
 
@@ -133,6 +135,7 @@ Card* User::spawnCard(int no)
 	Card* newCard = new Card(cb, newID);
 	cardMap[newID] = newCard;
 
+    emit spawnCardSignal(no, newID);
 	return newCard;
 }
 
@@ -302,20 +305,101 @@ void User::myTurn()
 	// both of users gave up
 	if (getIsGiveUp() == true && enemy->getIsGiveUp() == true) {
 		//emit signal: 라운드 종료 slot: Game.finishRound
+        emit turnChangedSignal();
 		return;
 	}
 
 	if (getIsGiveUp() == true) {
 		//emit signal: 턴 넘기기 slot: Game.nextTurn
+        emit turnChangedSignal();
 		return;
 	}
 
-	drawCard(1);
+    if (hand.size() <= 0) {
+        is_giveUp = true;
+        emit turnChangedSignal();
+        return;
+    }
+    if (line[0].size() == 5 && line[1].size() == 5 && line[2].size() == 5) {
+        is_giveUp = true;
+        emit turnChangedSignal();
+        return;
+    }
+
+    drawCard(1);
+
+    // wait for 10 seconds
+    timer->start(10 * 1000);
 
 	// 날씨 효과
-	// timer가 돌아갈 동안 카드를 선택해서 내기 deployCard
 	// 만약 시간이 다 됐으면 hand에서 카드 무작위로 한장 버리기
-	// 그리고 턴을 넘기기 emit signal: 턴 넘기기 slot: Game.nextTurn
+}
+
+void User::myTurnAI()
+{
+    // both of users gave up
+    if (getIsGiveUp() == true && enemy->getIsGiveUp() == true) {
+        //emit signal: 라운드 종료 slot: Game.finishRound
+        return;
+    }
+
+    if (getIsGiveUp() == true) {
+        //emit signal: 턴 넘기기 slot: Game.nextTurn
+        return;
+    }
+
+    drawCard(1);
+
+    if (hand.size() <= 0) {
+        is_giveUp = true;
+        return;
+    }
+    if (line[0].size() == 5 && line[1].size() == 5 && line[2].size() == 5) {
+        is_giveUp = true;
+        return;
+    }
+
+    // decide deploy line randomly
+    std::vector<ID> emptyLine = std::vector<ID>();
+    for (int i = 0; i <= 2; i++) {
+        if (line[i].size() < 5)
+            emptyLine.push_back(i);
+    }
+    int lo = 0;
+
+    // decide deploy cardID
+    int cardID = 0;
+    bool is_existProperCard = false;
+    for (int i = 0; i < hand.size(); i++) {
+        cardID = hand[i];
+        int line = getCardFromID(cardID)->line;
+        if (line == LINE::ANY || line == LINE::WEATHER || line == LINE::EVENT) {
+            lo = util::getRandNumBetween(emptyLine[0], emptyLine.size()-1);
+            is_existProperCard = true;
+            break;
+        } else {
+            for (auto lineIndex : emptyLine) {
+                if (lineIndex == line - 1) {
+                    lo = lineIndex;
+                    is_existProperCard = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!is_existProperCard) {
+        is_giveUp = true;
+        return;
+    }
+
+    // deploy card
+    deployCard(LO(lo+3), cardID);
+
+    // 날씨 효과
+    // timer가 돌아갈 동안 카드를 선택해서 내기 deployCard
+    // 만약 시간이 다 됐으면 hand에서 카드 무작위로 한장 버리기
+    // 그리고 턴을 넘기기 emit signal: 턴 넘기기 slot: Game.nextTurn
 }
 
 void User::useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location)
@@ -390,6 +474,7 @@ void User::changeStrength(ID cardID, int v) // v is + or -
 		return;
 	}
 
+    emit changeUnitScoreSignal(cardID);
 	changeRoundScoreForLine(findLine(cardID), v);
 }
 

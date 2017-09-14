@@ -9,12 +9,14 @@
 #include <vector>
 #include <algorithm>
 #include <QObject>
+#include <QTimer>
 
 class User : public QObject{
     Q_OBJECT
 public:
 	std::map<ID, Card*> cardMap;
 	User* enemy;
+    QTimer* timer;
 
 	// (추방당한거 아니면) 카드가 여기 다섯 군데중 한군데에는 무조건 있음
 	std::vector<ID> deck;
@@ -37,6 +39,9 @@ signals:
     void removeCardFromHandSignal(int);
     void deployCardToLineSignal(int, int);
     void deployWeatherSignal(int, int);
+    void spawnCardSignal(int, int);
+    void changeUnitScoreSignal(int);
+    void turnChangedSignal();
 public:
 	User(std::vector<CardBase*> *cardBaseCollection = new std::vector<CardBase*>) :
         is_giveUp(false)
@@ -81,7 +86,8 @@ public slots:
 	void changeRoundScoreForLine(LO lo, int v);	// add or sub playing round score for a line
 
 	/* others */
-	void myTurn();						// play game in my turn (draw and deploy)
+    void myTurn();						// play game in my turn (draw and deploy)
+    void myTurnAI();
 	void useSkill(SKILLKIND kind, ID cardID, ID targetID, LO location);
 	void changeStrength(ID cardID, int v);
 

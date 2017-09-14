@@ -3,6 +3,10 @@
 #include "global.h"
 #include <QDebug>
 #include <QSignalMapper>
+#include <QSizePolicy>
+
+std::map<ID, CLabel*> g_cardImagesSmall_1 = std::map<ID, CLabel*>();
+std::map<ID, CLabel*> g_cardImagesSmall_2 = std::map<ID, CLabel*>();
 
 void PageSetDeck::init(QWidget* page) {
     QSignalMapper *m = new QSignalMapper();
@@ -32,7 +36,6 @@ void Page1P::startGame(QWidget* page, Game* game) {
     User* user1 = game->getUser(0);
     User* user2 = game->getUser(1);
 
-    QPixmap imageSmall[40];
     CLabel* imageLabelSmall[32];
     int i = 0;
     for (auto id : user1->deck) {
@@ -41,10 +44,11 @@ void Page1P::startGame(QWidget* page, Game* game) {
         int no = card->no;
         imageLabelSmall[i]->setPixmap(g_cardPixmapSmall[no-1]);
         imageLabelSmall[i]->setScaledContents(true);
-        g_cardImagesSmall_1.push_back(imageLabelSmall[i]);
-
-        QObject::connect(g_cardImagesSmall_1[i], SIGNAL(clicked()), m, SLOT(map()));
-        m->setMapping(g_cardImagesSmall_1[i], id);
+        QLabel *label = new QLabel(imageLabelSmall[i]);
+        label->setText("  " + QString::number(card->strength));
+        g_cardImagesSmall_1[id] = imageLabelSmall[i];
+        QObject::connect(g_cardImagesSmall_1[id], SIGNAL(clicked()), m, SLOT(map()));
+        m->setMapping(g_cardImagesSmall_1[id], id);
         i++;
     }
 
@@ -52,50 +56,24 @@ void Page1P::startGame(QWidget* page, Game* game) {
     i = 0;
     for (auto id : user2->deck) {
         imageLabelSmall2[i] = new CLabel();
+        Card* card = user2->getCardFromID(id);
         int no = user2->getCardFromID(id)->no;
         imageLabelSmall2[i]->setPixmap(g_cardPixmapSmall[no - 1]);
         imageLabelSmall2[i]->setScaledContents(true);
-        g_cardImagesSmall_2.push_back(imageLabelSmall2[i]);
-
-        QObject::connect(g_cardImagesSmall_2[i], SIGNAL(clicked()), m, SLOT(map()));
-        m->setMapping(g_cardImagesSmall_2[i], id);
+        QLabel *label = new QLabel(imageLabelSmall2[i]);
+        label->setText("  " + QString::number(card->strength));
+        g_cardImagesSmall_2[id] = imageLabelSmall2[i];
+        QObject::connect(g_cardImagesSmall_2[id], SIGNAL(clicked()), m, SLOT(map()));
+        m->setMapping(g_cardImagesSmall_2[id], id);
         i++;
     }
 
     user1->drawCard(10);
     user2->drawCard(10);
 
-    game->turn = 1;
-    user2->deployCard(LO::LINE1, user2->hand[0]);
-    user2->deployCard(LO::LINE2, user2->hand[0]);
-    user2->deployCard(LO::LINE2, user2->hand[0]);
-
-//    QGridLayout *glayout = page->findChild<QGridLayout*>("glayout_page_1p");
-
-//    int i = 1;
-//    int x, y;
-//    for (auto id : user1->hand) {
-//        x = i / 8 + 6;
-//        y = 9 - (i % 7);
-//        if (y == 9) y = 2;
-//        int no = user1->getCardFromID(id)->no;
-//        glayout->addWidget(g_cardImagesSmall[no - 1], x, y, 1, 1);
-//        g_cardImagesSmall[no - 1]->setParent(page);
-
-//        // mapping signal
-//        QObject::connect(g_cardImagesSmall[no - 1], SIGNAL(clicked()), m, SLOT(map()));
-//        m->setMapping(g_cardImagesSmall[no - 1], id);
-//        i++;
-//    }
-//    for (auto id : user1->deck) {
-//        int no = user1->getCardFromID(id)->no;
-//        QObject::connect(g_cardImagesSmall[no - 1], SIGNAL(clicked()), m, SLOT(map()));
-//        m->setMapping(g_cardImagesSmall[no - 1], id);
-//        i++;
-//    }
     QObject::connect(m, SIGNAL(mapped(int)), page->parent()->parent()->parent(), SLOT(gameCardSelected(int)));
 
     game->decideOrder();
-    game->turn = 0; // FIXME: 나중에 없엠
-    //game->startGame(page); 없엘 계획
+    game->turn = 1; // FIXME: 나중에 없엠
+    game->turnChange();
 }

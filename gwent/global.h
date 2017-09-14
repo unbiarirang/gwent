@@ -10,13 +10,15 @@
 #include <map>
 
 extern std::vector<CLabel*> g_cardImages;
-extern std::vector<CLabel*> g_cardImagesSmall_1;
-extern std::vector<CLabel*> g_cardImagesSmall_2;
+extern std::map<ID, CLabel*> g_cardImagesSmall_1;
+extern std::map<ID, CLabel*> g_cardImagesSmall_2;
 extern std::vector<CLabel*> g_user1CardImages;
 extern std::vector<CLabel*> g_user2CardImages;
 extern std::vector<CardBase*> g_cardCollection;
 extern std::vector<QPixmap> g_cardPixmap;
 extern std::vector<QPixmap> g_cardPixmapSmall;
+
+extern std::vector<CLabel*> labels;
 
 namespace Global {
     void init();

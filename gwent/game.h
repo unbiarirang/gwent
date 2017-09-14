@@ -3,8 +3,10 @@
 
 #include "user.h"
 #include <QWidget>
+#include <QObject>
 
-class Game {
+class Game : public QObject {
+    Q_OBJECT
 private:
 	User* user[2];
 
@@ -12,6 +14,7 @@ public:
 	int round;				// round 1,2,3
 	int turn;				// 0 for user0 and 1 for user1
 	int result[3];			// enum RESULT
+    int winner;
 	struct {				// rounds score
 		int user0Score;
 		int user1Score;
@@ -30,13 +33,18 @@ public:
 		user[1]->enemy = _user0;
 	}
 
-public:
+signals:
+    void turnChangedSignal();
+    void finishGameSignal();
+
+public slots:
 	void decideOrder();
 	void setCardsToDeck();
     void startGame(QWidget* page);
 	void finishRound();
 	void finishGame();
 	void removeLineWeather(User* u, int i);
+    void turnChange();
 
 	User* getUser(int i);
 };

@@ -29,6 +29,7 @@ signals:
 
     void selectCardMyLine(ID, LO);
     void selectCardEnemyLine(ID, LO);
+    void turnChangedSignal();
 
 private slots:
     void changeStackedWidget(QWidget* page);
@@ -64,11 +65,13 @@ private slots:
     void removeCard(int, int);
     void revoke(int, int);
     void changeRoundScore();
-
-    // for user2
+    void spawnCard(int, int);
+    void changeUnitScore(int);
     void deployWeather(int cardID, int line);
 
     void update();
+
+    void finishGame();
 
 private:
     Ui::MainWindow *ui;
@@ -80,6 +83,9 @@ private:
     int line;
     int timeCount;
     int cardID;
+
+    QTimer *timer;
+    QTimer *userTimer;
 
     // for user1
     std::vector<QPair<int,int>>* emptyDeckSpace;

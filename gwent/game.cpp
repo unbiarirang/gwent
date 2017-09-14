@@ -72,6 +72,26 @@ void Game::startGame(QWidget* page) // FIXME: DELETE THIS FUNCTION
 //    }
 }
 
+void Game::turnChange()
+{
+    if (turn == 0) turn = 1;
+    else turn = 0;
+
+    if (user[0]->getIsGiveUp() == true && user[1]->getIsGiveUp() == true) {
+        finishGame();
+        return;
+    }
+
+    User* userNow = getUser(turn);
+    if (userNow == user[0]) {
+        userNow->myTurn();
+    }
+    else {
+        userNow->myTurnAI();
+        emit turnChangedSignal();
+    }
+}
+
 void Game::finishRound()
 {
 	int user0Score = user[0]->getRoundScore();
@@ -110,7 +130,14 @@ void Game::finishRound()
 
 void Game::finishGame()
 {
-	// TODO: 여러가지 ui 동작
+    if (user[0]->getRoundScore() > user[1]->getRoundScore())
+        winner = 0;
+    else if (user[0]->getRoundScore() > user[1]->getRoundScore())
+        winner = 1;
+    else
+        winner = 2;
+
+    emit finishGameSignal();
 }
 
 void Game::removeLineWeather(User* u, int i)

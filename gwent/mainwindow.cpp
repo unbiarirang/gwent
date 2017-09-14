@@ -19,6 +19,13 @@
 #include <QPair>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include <QMessageBox>
+
+extern std::map<ID, CLabel*> g_cardImagesSmall_1;
+extern std::map<ID, CLabel*> g_cardImagesSmall_2;
+extern std::vector<QPixmap> g_cardPixmapSmall;
+
+std::vector<CLabel*> labels = std::vector<CLabel*>();
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -67,6 +74,16 @@ void MainWindow::on_button_login_clicked()
 void MainWindow::cardSelected(int x)
 {
     QVBoxLayout *vlayout = ui->vlayout_setDeck;
+
+    int type = g_cardCollection[x-1]->type;
+    int count = 0;
+    if (type == TYPE::GOLD || type == TYPE::SILVER) count = 1;
+    else count = 3;
+
+    for (auto id : deck) {
+        if (id == x) count--;
+        if (count == 0) return;
+    }
 
     QLabel *label = new QLabel();
     QString name = QString::fromStdString(g_cardNameMap[CARDNO(x)]);
@@ -143,16 +160,23 @@ void MainWindow::on_button_menu_1p_clicked()
 
     std::vector<CardBase*> defaultCollection = g_cardCollection; // TODO: default deck도 하나 만들어 놔야함
     std::vector<CardBase*> cardCollection1 = std::vector<CardBase*>();
+    std::vector<CardBase*> cardCollection2 = std::vector<CardBase*>();
     if (deck1 == std::vector<int>())    // didn't save deck
         cardCollection1 = defaultCollection; // default deck TODO: 카드 고르는 제한 만들기
     else {
         for (auto cardNo : deck1)
             cardCollection1.push_back(g_cardCollection[cardNo - 1]);
     }
+    if (deck2 == std::vector<int>())    // didn't save deck
+        cardCollection2 = defaultCollection; // default deck TODO: 카드 고르는 제한 만들기
+    else {
+        for (auto cardNo : deck2)
+            cardCollection2.push_back(g_cardCollection[cardNo - 1]);
+    }
 
     // cardCollection1 으로 user1을 만듬
     User* user1 = new User(&cardCollection1);
-    User* user2 = new User(&defaultCollection);
+    User* user2 = new User(&cardCollection2);
 
 //    connect(this, SIGNAL(placeCard(int,int)), this, SLOT(removeCardFromHand(int)));
 //    connect(this, SIGNAL(placeCard(int,int)), this, SLOT(deployCardToLine(int,int)));
@@ -163,6 +187,8 @@ void MainWindow::on_button_menu_1p_clicked()
     connect(user1, SIGNAL(removeCardSignal(int,int)), this, SLOT(removeCard(int,int)));
     connect(user1, SIGNAL(scoreChanged()), this, SLOT(changeRoundScore()));
     connect(user1, SIGNAL(drawCardSignal(int)), this, SLOT(drawCard(int)));
+    connect(user1, SIGNAL(spawnCardSignal(int,int)), this, SLOT(spawnCard(int,int)));
+    connect(user1, SIGNAL(changeUnitScoreSignal(int)), this, SLOT(changeUnitScore(int)));
     connect(this, SIGNAL(turnFinished()), user1, SLOT(myTurn()));
 
     //connect(this, SIGNAL(placeCard(LO,ID)), user2, SLOT(deployCard(LO,ID)));
@@ -171,9 +197,10 @@ void MainWindow::on_button_menu_1p_clicked()
     connect(user2, SIGNAL(deployWeatherSignal(int,int)), this, SLOT(deployWeather(int,int)));
     connect(user2, SIGNAL(removeCardSignal(int,int)), this, SLOT(removeCard(int,int)));
     connect(user2, SIGNAL(scoreChanged()), this, SLOT(changeRoundScore()));
+    connect(user2, SIGNAL(spawnCardSignal(int,int)), this, SLOT(spawnCard(int,int)));
+    connect(user2, SIGNAL(changeUnitScoreSignal(int)), this, SLOT(changeUnitScore(int)));
     //connect(user2, SIGNAL(drawCardSignal(int)), this, SLOT(drawCard(int)));
     //connect(this, SIGNAL(turnFinished()), user2, SLOT(myTurn()));
-
 
     emptyDeckSpace = new std::vector<QPair<int,int>>();
     emptyDeckSpace->push_back(qMakePair(7,2));
@@ -222,6 +249,18 @@ void MainWindow::on_button_menu_1p_clicked()
     emptyLine3_2.push_back(qMakePair(0,6));
 
     game = new Game(user1, user2);
+
+    connect(game, SIGNAL(finishGameSignal()), this, SLOT(finishGame()));
+    connect(this, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
+    connect(game, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
+    connect(user1, SIGNAL(turnChangedSignal()), game, SLOT(turnChange()));
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), game, SLOT(turnChange()));
+    user1->timer = new QTimer(this);
+    user1->timer->setSingleShot(true);
+    connect(user1->timer, SIGNAL(timeout()), game, SLOT(turnChange()));
+
     Page1P::startGame(ui->page_1p, game);
 }
 
@@ -236,7 +275,7 @@ void MainWindow::gameCardSelected(int id)
 //    timer->start(1000);
 
     User* user = game->getUser(game->turn);
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
@@ -244,9 +283,9 @@ void MainWindow::gameCardSelected(int id)
     if (card == nullptr) return;
     int no = user->getCardFromID(cardID)->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    int index = glayout->indexOf(g_cardImagesSmall[no-1]);
+    int index = glayout->indexOf(g_cardImagesSmall[cardID]);
     if (index == -1) return;
-    auto pos = gridPosition(g_cardImagesSmall[no-1]);
+    auto pos = gridPosition(g_cardImagesSmall[cardID]);
     if (pos.first == 3 || pos.first == 4 || pos.first == 5) // select a card on my line
         emit selectCardMyLine(ID(cardID), LO(pos.first)); // ID/LO
     if (pos.first == 2 || pos.first == 1 || pos.first == 0)
@@ -256,36 +295,54 @@ void MainWindow::on_pushButton_3_clicked()
 {
     qDebug() << "line 1 clicked";
     emit placeCard(LO::LINE1, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     qDebug() << "line 2 clicked";
     emit placeCard(LO::LINE2, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::on_pushButton_clicked()
 {
     qDebug() << "line 3 clicked";
     emit placeCard(LO::LINE3, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
     qDebug() << "line 1 clicked";
     emit placeCard(LO::LINE1, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::on_pushButton_5_clicked()
 {
     qDebug() << "line 2 clicked";
     emit placeCard(LO::LINE2, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::on_pushButton_6_clicked()
 {
     qDebug() << "line 3 clicked";
     emit placeCard(LO::LINE3, ID(cardID));
+    //emit turnChangedSignal();
+    game->getUser(0)->timer->stop();
+    timer->start(1000);
 }
 
 void MainWindow::update()
@@ -314,17 +371,17 @@ void MainWindow::removeCardFromHand(int cardID)
     Card* card = user->getCardFromID(cardID);
     if (card == nullptr) return;
 
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
     int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    int index = glayout->indexOf(g_cardImagesSmall[no-1]);
+    int index = glayout->indexOf(g_cardImagesSmall[cardID]);
     if (index == -1) return;
 
 
-    auto pos = gridPosition(g_cardImagesSmall[no-1]);
+    auto pos = gridPosition(g_cardImagesSmall[cardID]);
     emptyDeckSpace->push_back(pos);
     // remove a card from deck 옮기는 거면 지울 필요가 없는듯?
     //glayout->takeAt(index)->widget();
@@ -342,12 +399,12 @@ void MainWindow::drawCard(int id)
     if (card == nullptr) return;
     int no = card->no;
 
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
     QGridLayout *glayout = ui->glayout_page_1p;
-    glayout->addWidget(g_cardImagesSmall[no-1], pos.first, pos.second, 1, 1);
+    glayout->addWidget(g_cardImagesSmall[id], pos.first, pos.second, 1, 1);
 }
 
 void MainWindow::deployCardToLine(int cardID, int line)
@@ -382,14 +439,15 @@ void MainWindow::deployCardToLine(int cardID, int line)
 //        revoke(cardID, line);
 //        return;
 //    }
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
     // insert a card into the line
     auto pos = (*emptyLine)[(*emptyLine).size()-1];
     (*emptyLine).pop_back();
-    glayout->addWidget(g_cardImagesSmall[no-1], pos.first, pos.second, 1, 1);
+    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 
     // insert a empty card into previous card location
     QPixmap pix = QPixmap();
@@ -398,8 +456,6 @@ void MainWindow::deployCardToLine(int cardID, int line)
     emptyLabel->setPixmap(pix);
     pos = (*emptyDeckSpace)[emptyDeckSpace->size()-1];
     glayout->addWidget(emptyLabel, pos.first, pos.second, 1, 1);
-
-    emit turnFinished();
 }
 
 void MainWindow::deployWeather(int cardID, int line)
@@ -433,14 +489,14 @@ void MainWindow::deployWeather(int cardID, int line)
         return;
     }
 
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
     // insert a card into the line
     auto pos = (*emptyLine)[(*emptyLine).size()-1];
     (*emptyLine).pop_back();
-    glayout->addWidget(g_cardImagesSmall[no-1], pos.first, pos.second, 1, 1);
+    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 
     // insert a empty card into previous card location
     QPixmap pix = QPixmap();
@@ -449,8 +505,6 @@ void MainWindow::deployWeather(int cardID, int line)
     emptyLabel->setPixmap(pix);
     pos = (*emptyDeckSpace)[emptyDeckSpace->size()-1];
     glayout->addWidget(emptyLabel, pos.first, pos.second, 1, 1);
-
-    emit turnFinished();
 }
 
 void MainWindow::removeCard(int cardID, int line)
@@ -466,14 +520,14 @@ void MainWindow::removeCard(int cardID, int line)
 
     int no = card->no;
     QGridLayout *glayout = ui->glayout_page_1p;
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
-    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
-    else g_cardImagesSmall = g_cardImagesSmall_2;
+    std::map<ID, CLabel*>* g_cardImagesSmall = new std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) g_cardImagesSmall = &g_cardImagesSmall_1;
+    else g_cardImagesSmall = &g_cardImagesSmall_2;
 
-    int index = glayout->indexOf(g_cardImagesSmall[no-1]);
+    int index = glayout->indexOf((*g_cardImagesSmall)[cardID]);
     qDebug() << "(in remove card)index: " << index;
     if (index == -1) return;
-    auto pos = gridPosition(g_cardImagesSmall[no-1]);
+    auto pos = gridPosition((*g_cardImagesSmall)[cardID]);
 
     std::vector<QPair<int,int>>* emptyLine;
     if (user == game->getUser(0)) {
@@ -489,7 +543,11 @@ void MainWindow::removeCard(int cardID, int line)
     } else return;
 
     (*emptyLine).push_back(qMakePair(pos.first,pos.second));
-    delete glayout->takeAt(index)->widget();
+    if (QLayoutItem *w = glayout->takeAt(index)) {
+        delete w;
+    }
+    if ((*g_cardImagesSmall)[cardID])
+        delete (*g_cardImagesSmall)[cardID];
 }
 
 void MainWindow::revoke(int cardID, int line)
@@ -503,12 +561,12 @@ void MainWindow::revoke(int cardID, int line)
     if (card == nullptr) return;
     int no = card->no;
 
-    std::vector<CLabel*> g_cardImagesSmall = std::vector<CLabel*>();
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
     if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
     else g_cardImagesSmall = g_cardImagesSmall_2;
 
     QGridLayout *glayout = ui->glayout_page_1p;
-    glayout->addWidget(g_cardImagesSmall[no-1], pos.first, pos.second, 1, 1);
+    glayout->addWidget(g_cardImagesSmall[cardID], pos.first, pos.second, 1, 1);
 }
 
 void MainWindow::changeRoundScore()
@@ -522,3 +580,47 @@ void MainWindow::changeRoundScore()
     scoreLabel2->setText(QString::number(score2));
 }
 
+void MainWindow::changeUnitScore(int cardID)
+{
+    User* user = game->getUser(game->turn);
+    std::map<ID, CLabel*> g_cardImagesSmall = std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) g_cardImagesSmall = g_cardImagesSmall_1;
+    else g_cardImagesSmall = g_cardImagesSmall_2;
+    QLabel *label = g_cardImagesSmall[cardID]->findChild<QLabel*>();
+    label->setText(QString::number(user->getCardFromID(cardID)->getStrength()));
+}
+
+void MainWindow::spawnCard(int no, int id)
+{
+    User* user = game->getUser(game->turn);
+    std::map<ID, CLabel*>* g_cardImagesSmall = new std::map<ID, CLabel*>();
+    if (user == game->getUser(0)) g_cardImagesSmall = &g_cardImagesSmall_1;
+    else g_cardImagesSmall = &g_cardImagesSmall_2;
+
+    CLabel* label = new CLabel();
+    label->setPixmap(g_cardPixmapSmall[no-1]);
+    label->setScaledContents(true);
+    labels.push_back(label);
+    (*g_cardImagesSmall)[id] = label;
+
+    QSignalMapper *m = new QSignalMapper();
+    QObject::connect((*g_cardImagesSmall)[id], SIGNAL(clicked()), m, SLOT(map()));
+    m->setMapping((*g_cardImagesSmall)[id], id);
+    QObject::connect(m, SIGNAL(mapped(int)), this, SLOT(gameCardSelected(int)));
+
+    QLabel *scoreLabel = new QLabel((*g_cardImagesSmall)[id]);
+    scoreLabel->setText("  " + QString::number(user->getCardFromID(id)->strength));
+
+    qDebug() << "spawned a card id : " << id;
+}
+
+void MainWindow::finishGame()
+{
+    QString str;
+    if (game->winner == 0) str = QString::fromStdString("you");
+    else if (game->winner == 1) str = QString::fromStdString("AI");
+    else str = QString::fromStdString("both of you");
+
+    // print game result
+    QMessageBox::information(this, "The game is over", "the winner is " + str);
+}

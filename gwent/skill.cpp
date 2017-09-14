@@ -479,8 +479,7 @@ void thunderboltPotion(User * user, ID cardID, ID targetID, LO location = LO(), 
 void dagon(User * user, ID cardID, ID targetID, LO location, int data)
 {
 	data = 22; // FIXME: 날씨 배치할 location이랑 data 받아야하는데 어떻게 받을지 고민
-	LO lo = LO::LINE1;
-	spawn(user, cardID, targetID, lo, data);
+    spawn(user, cardID, targetID, location, data);
 }
 
 /*

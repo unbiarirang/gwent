@@ -9,8 +9,7 @@
 
 std::map<CARDNO, std::string> g_cardNameMap = std::map<CARDNO, std::string>();
 std::vector<CLabel*> g_cardImages = std::vector<CLabel*>();
-std::vector<CLabel*> g_cardImagesSmall_1 = std::vector<CLabel*>();
-std::vector<CLabel*> g_cardImagesSmall_2 = std::vector<CLabel*>();
+
 std::vector<CLabel*> g_user1CardImages = std::vector<CLabel*>();
 std::vector<CLabel*> g_user2CardImages = std::vector<CLabel*>();
 std::vector<QPixmap> g_cardPixmap = std::vector<QPixmap>();
